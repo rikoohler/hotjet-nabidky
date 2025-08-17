@@ -1268,7 +1268,7 @@ function App() {
                     endpoint:
                   </p>
                   <code className="block bg-white p-2 rounded border text-sm">
-                    fetch('/api/pricelist').then(res => res.json())
+                    {`fetch('/api/pricelist').then(res => res.json())`}
                   </code>
                 </div>
               </div>
