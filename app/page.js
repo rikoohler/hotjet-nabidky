@@ -556,20 +556,16 @@ function App() {
           </tr>`;
 
         items.forEach(([key, item]) => {
-          const [category, code] = key.split("-");
-          const product = priceList[category].items.find(
-            (p) => p.code === code
-          );
-          const priceAfterDiscount = product.price * (1 - discount);
+          const priceAfterDiscount = item.price * (1 - discount);
           const total = priceAfterDiscount * item.quantity;
           heatPumpTotal += total;
 
           html += `
           <tr>
-            <td>${product.code}</td>
-            <td>${product.name}</td>
-            <td>${product.price.toLocaleString("cs-CZ")} Kč</td>
-            <td>${(product.price * discount).toLocaleString("cs-CZ")} Kč</td>
+            <td>${item.code}</td>
+            <td>${item.name}</td>
+            <td>${item.price.toLocaleString("cs-CZ")} Kč</td>
+            <td>${(item.price * discount).toLocaleString("cs-CZ")} Kč</td>
             <td>${priceAfterDiscount.toLocaleString("cs-CZ")} Kč</td>
             <td>${item.quantity}</td>
             <td><strong>${total.toLocaleString("cs-CZ")} Kč</strong></td>
@@ -607,20 +603,16 @@ function App() {
           </tr>`;
 
         items.forEach(([key, item]) => {
-          const [category, code] = key.split("-");
-          const product = priceList[category].items.find(
-            (p) => p.code === code
-          );
-          const priceAfterDiscount = product.price * (1 - discount);
+          const priceAfterDiscount = item.price * (1 - discount);
           const total = priceAfterDiscount * item.quantity;
           heatPumpTotal += total;
 
           html += `
           <tr>
-            <td>${product.code}</td>
-            <td>${product.name}</td>
-            <td>${product.price.toLocaleString("cs-CZ")} Kč</td>
-            <td>${(product.price * discount).toLocaleString("cs-CZ")} Kč</td>
+            <td>${item.code}</td>
+            <td>${item.name}</td>
+            <td>${item.price.toLocaleString("cs-CZ")} Kč</td>
+            <td>${(item.price * discount).toLocaleString("cs-CZ")} Kč</td>
             <td>${priceAfterDiscount.toLocaleString("cs-CZ")} Kč</td>
             <td>${item.quantity}</td>
             <td><strong>${total.toLocaleString("cs-CZ")} Kč</strong></td>
@@ -663,20 +655,16 @@ function App() {
           </tr>`;
 
         items.forEach(([key, item]) => {
-          const [category, code] = key.split("-");
-          const product = priceList[category].items.find(
-            (p) => p.code === code
-          );
-          const priceAfterDiscount = product.price * (1 - discount);
+          const priceAfterDiscount = item.price * (1 - discount);
           const total = priceAfterDiscount * item.quantity;
           accessoriesTotal += total;
 
           html += `
           <tr>
-            <td>${product.code}</td>
-            <td>${product.name}</td>
-            <td>${product.price.toLocaleString("cs-CZ")} Kč</td>
-            <td>${(product.price * discount).toLocaleString("cs-CZ")} Kč</td>
+            <td>${item.code}</td>
+            <td>${item.name}</td>
+            <td>${item.price.toLocaleString("cs-CZ")} Kč</td>
+            <td>${(item.price * discount).toLocaleString("cs-CZ")} Kč</td>
             <td>${priceAfterDiscount.toLocaleString("cs-CZ")} Kč</td>
             <td>${item.quantity}</td>
             <td><strong>${total.toLocaleString("cs-CZ")} Kč</strong></td>
@@ -775,19 +763,50 @@ function App() {
   // Toggle výběr položky
   const toggleItem = (category, code) => {
     const key = `${category}-${code}`;
-    setSelectedItems((prev) => ({
-      ...prev,
-      [key]: prev[key] ? { ...prev[key], quantity: 0 } : { quantity: 1 },
-    }));
+    const product = priceList[category].items.find((p) => p.code === code);
+    
+    setSelectedItems((prev) => {
+      if (prev[key] && prev[key].quantity > 0) {
+        // Odškrtnout - smazat úplně z objektu
+        const newItems = { ...prev };
+        delete newItems[key];
+        return newItems;
+      } else {
+        // Zaškrtnout - přidat s kompletními informacemi
+        return {
+          ...prev,
+          [key]: {
+            ...product,
+            quantity: 1,
+          },
+        };
+      }
+    });
   };
 
   // Změna množství
   const updateQuantity = (category, code, quantity) => {
     const key = `${category}-${code}`;
-    setSelectedItems((prev) => ({
-      ...prev,
-      [key]: { quantity: parseInt(quantity) || 0 },
-    }));
+    const product = priceList[category].items.find((p) => p.code === code);
+    const newQuantity = parseInt(quantity) || 0;
+    
+    setSelectedItems((prev) => {
+      if (newQuantity === 0) {
+        // Pokud je množství 0, smazat z objektu
+        const newItems = { ...prev };
+        delete newItems[key];
+        return newItems;
+      } else {
+        // Jinak aktualizovat s kompletními informacemi
+        return {
+          ...prev,
+          [key]: {
+            ...product,
+            quantity: newQuantity,
+          },
+        };
+      }
+    });
   };
 
   // Toggle výběr práce
@@ -797,21 +816,44 @@ function App() {
     const work = workList[index];
     const key = `work-${index}`;
 
-    setSelectedWork((prev) => ({
-      ...prev,
-      [key]: prev[key]
-        ? { ...prev[key], quantity: 0 }
-        : { name: work.name, price: work.price, quantity: 1 },
-    }));
+    setSelectedWork((prev) => {
+      if (prev[key] && prev[key].quantity > 0) {
+        // Odškrtnout - smazat úplně z objektu
+        const newWork = { ...prev };
+        delete newWork[key];
+        return newWork;
+      } else {
+        // Zaškrtnout - přidat s kompletními informacemi
+        return {
+          ...prev,
+          [key]: { name: work.name, price: work.price, quantity: 1 },
+        };
+      }
+    });
   };
 
   // Změna množství práce
   const updateWorkQuantity = (index, quantity) => {
+    const workList =
+      heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
+    const work = workList[index];
     const key = `work-${index}`;
-    setSelectedWork((prev) => ({
-      ...prev,
-      [key]: { ...prev[key], quantity: parseInt(quantity) || 0 },
-    }));
+    const newQuantity = parseInt(quantity) || 0;
+    
+    setSelectedWork((prev) => {
+      if (newQuantity === 0) {
+        // Pokud je množství 0, smazat z objektu
+        const newWork = { ...prev };
+        delete newWork[key];
+        return newWork;
+      } else {
+        // Jinak aktualizovat s kompletními informacemi
+        return {
+          ...prev,
+          [key]: { name: work.name, price: work.price, quantity: newQuantity },
+        };
+      }
+    });
   };
 
   // Filtrování kategorií podle typu TČ
@@ -1127,41 +1169,37 @@ function App() {
                   Přehled vybraných položek
                 </h2>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {Object.entries(selectedItems)
-                    .filter(([key, val]) => val.quantity > 0)
-                    .map(([key, item]) => {
-                      const [category, code] = key.split("-");
-                      const product = priceList[category].items.find(
-                        (p) => p.code === code
-                      );
-                      const discount = getDiscount();
-                      const priceAfterDiscount = product.price * (1 - discount);
-                      return (
-                        <div
-                          key={key}
-                          className="flex justify-between text-sm py-1 border-b"
-                        >
-                          <div>
-                            <div>{product.name}</div>
-                            <div className="text-xs text-gray-500">
-                              {product.code}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div>
-                              {item.quantity}x{" "}
-                              {priceAfterDiscount.toLocaleString("cs-CZ")} Kč
-                            </div>
-                            <div className="font-semibold">
-                              {(
-                                priceAfterDiscount * item.quantity
-                              ).toLocaleString("cs-CZ")}{" "}
-                              Kč
-                            </div>
+                                  {Object.entries(selectedItems)
+                  .filter(([key, val]) => val.quantity > 0)
+                  .map(([key, item]) => {
+                    const discount = getDiscount();
+                    const priceAfterDiscount = item.price * (1 - discount);
+                    return (
+                      <div
+                        key={key}
+                        className="flex justify-between text-sm py-1 border-b"
+                      >
+                        <div>
+                          <div>{item.name}</div>
+                          <div className="text-xs text-gray-500">
+                            {item.code}
                           </div>
                         </div>
-                      );
-                    })}
+                        <div className="text-right">
+                          <div>
+                            {item.quantity}x{" "}
+                            {priceAfterDiscount.toLocaleString("cs-CZ")} Kč
+                          </div>
+                          <div className="font-semibold">
+                            {(
+                              priceAfterDiscount * item.quantity
+                            ).toLocaleString("cs-CZ")}{" "}
+                            Kč
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                   {Object.entries(selectedWork)
                     .filter(([key, val]) => val.quantity > 0)
                     .map(([key, item]) => (
