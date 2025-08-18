@@ -9,6 +9,7 @@ import CategoryNavigation from "../components/CategoryNavigation";
 import WorkSelection from "../components/WorkSelection";
 import SelectedItemsList from "../components/SelectedItemsList";
 import EmailGenerator from "../components/EmailGenerator";
+import PriceListGenerator from "../components/PriceListGenerator";
 
 // Import dat a utilit
 import { defaultPriceList } from "../data/priceList";
@@ -291,12 +292,14 @@ function App() {
                   onChange={(e) => setOfferDescription(e.target.value)}
                   placeholder="Zde můžete přidat popis a vysvětlení k nabídce..."
                   className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 resize-y"
-                  style={{ minHeight: '100px' }}
+                  style={{ minHeight: "100px" }}
                 />
                 <p className="text-sm text-gray-600 mt-2">
                   💡 Tento text se zobrazí v nabídce pouze pokud není prázdný
                 </p>
               </div>
+
+              <PriceListGenerator />
 
               <EmailGenerator
                 projectName={projectName}
