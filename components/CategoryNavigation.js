@@ -92,16 +92,26 @@ const CategoryNavigation = ({
           Výběr položek -{" "}
           {heatPumpType === "vzduch" ? "Vzduch-voda" : "Země/Voda-voda"}
         </h2>
-        {(selectedCategory || selectedSubcategory) && (
+        {selectedSubcategory && (
           <button
             onClick={() => {
               setSelectedSubcategory("");
+            }}
+            className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all text-sm"
+          >
+            <ArrowLeft size={16} />
+            Zpět na kategorie
+          </button>
+        )}
+        {selectedCategory && !selectedSubcategory && (
+          <button
+            onClick={() => {
               setSelectedCategory("");
             }}
             className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all text-sm"
           >
             <ArrowLeft size={16} />
-            Zpět
+            Zpět na začátek
           </button>
         )}
       </div>
