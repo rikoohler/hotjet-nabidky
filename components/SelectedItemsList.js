@@ -1,6 +1,6 @@
 // Komponenta pro přehled vybraných položek
-import React from 'react';
-import { formatPrice, getDiscount } from '../utils/calculations';
+import React from "react";
+import { formatPrice, getDiscount } from "../utils/calculations";
 
 const SelectedItemsList = ({
   selectedItems,
@@ -28,14 +28,11 @@ const SelectedItemsList = ({
               >
                 <div className="flex-1">
                   <div className="font-medium">{item.name}</div>
-                  <div className="text-xs text-gray-500">
-                    {item.code}
-                  </div>
+                  <div className="text-xs text-gray-500">{item.code}</div>
                 </div>
                 <div className="text-right mr-2">
                   <div>
-                    {item.quantity}x{" "}
-                    {formatPrice(priceAfterDiscount)} Kč
+                    {item.quantity}x {formatPrice(priceAfterDiscount)} Kč
                   </div>
                   <div className="font-semibold">
                     {formatPrice(priceAfterDiscount * item.quantity)} Kč
@@ -64,8 +61,7 @@ const SelectedItemsList = ({
               </div>
               <div className="text-right mr-2">
                 <div>
-                  {item.quantity}x{" "}
-                  {formatPrice(item.price)} Kč
+                  {item.quantity}x {formatPrice(item.price)} Kč
                 </div>
                 <div className="font-semibold">
                   {formatPrice(item.price * item.quantity)} Kč
@@ -81,7 +77,7 @@ const SelectedItemsList = ({
             </div>
           ))}
       </div>
-      
+
       {/* Součet bez DPH */}
       {(Object.keys(selectedItems).length > 0 ||
         Object.keys(selectedWork).length > 0) && (
@@ -100,8 +96,7 @@ const SelectedItemsList = ({
                     Object.entries(selectedWork)
                       .filter(([key, val]) => val.quantity > 0)
                       .reduce(
-                        (sum, [key, item]) =>
-                          sum + item.price * item.quantity,
+                        (sum, [key, item]) => sum + item.price * item.quantity,
                         0
                       )
                 )}{" "}
@@ -109,8 +104,8 @@ const SelectedItemsList = ({
               </span>
             </div>
             <div className="text-xs text-gray-500">
-              DPH {customerType === "koncovy" ? "12%" : "21%"} se
-              přidá při generování nabídky
+              DPH {customerType === "koncovy" ? "12%" : "21%"} se přidá při
+              generování nabídky
             </div>
           </div>
         </div>

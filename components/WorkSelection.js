@@ -1,6 +1,6 @@
 // Komponenta pro výběr prací a instalačního materiálu
-import React from 'react';
-import { formatPrice } from '../utils/calculations';
+import React from "react";
+import { formatPrice } from "../utils/calculations";
 
 const WorkSelection = ({
   heatPumpType,
@@ -39,20 +39,28 @@ const WorkSelection = ({
                         type="number"
                         min="0"
                         value={selectedWork[key]?.price || work.price}
-                        onChange={(e) =>
-                          updateWorkPrice(
-                            index,
-                            parseInt(e.target.value) || 0
-                          )
-                        }
-                        className="w-20 px-1 py-0.5 border rounded text-xs"
+                        onChange={(e) => {
+                          // Povolit prázdný string během editace
+                          const value = e.target.value;
+                          if (value === "") {
+                            updateWorkPrice(index, "");
+                          } else {
+                            updateWorkPrice(index, parseInt(value) || 0);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          // Při opuštění pole nastavit na původní cenu pokud je prázdné
+                          const value = e.target.value;
+                          if (value === "") {
+                            updateWorkPrice(index, work.price);
+                          }
+                        }}
+                        className="w-20 px-1 py-0.5 border rounded text-xs text-gray-900"
                       />
                       <span>Kč</span>
                     </>
                   ) : (
-                    <span>
-                      {formatPrice(work.price)} Kč
-                    </span>
+                    <span>{formatPrice(work.price)} Kč</span>
                   )}
                 </div>
               </div>
@@ -63,10 +71,8 @@ const WorkSelection = ({
                     type="number"
                     min="0"
                     value={selectedWork[key]?.quantity || 0}
-                    onChange={(e) =>
-                      updateWorkQuantity(index, e.target.value)
-                    }
-                    className="w-16 px-2 py-1 border rounded text-xs"
+                    onChange={(e) => updateWorkQuantity(index, e.target.value)}
+                    className="w-16 px-2 py-1 border rounded text-xs text-gray-900"
                   />
                 </div>
               )}

@@ -1,5 +1,5 @@
 // Utility funkce pro generování email nabídky
-import { formatPrice } from './calculations';
+import { formatPrice } from "./calculations";
 
 export const generateEmailOffer = async ({
   projectName,
@@ -29,7 +29,9 @@ export const generateEmailOffer = async ({
   <div style="margin: 20px 0;">
     <p><strong>Akce:</strong> ${projectName}</p>
     <p><strong>Zákazník:</strong> ${customerName}</p>
-    <p><strong>Datum vystavení:</strong> ${new Date(offerDate).toLocaleDateString("cs-CZ")}</p>
+    <p><strong>Datum vystavení:</strong> ${new Date(
+      offerDate
+    ).toLocaleDateString("cs-CZ")}</p>
     <p><strong>Platnost nabídky:</strong> 30 dní</p>
   </div>
   
@@ -50,9 +52,9 @@ export const generateEmailOffer = async ({
             <tr style="background: #f0f0f0;">
               <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Kód</th>
               <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Popis</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Cena po slevě</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;">Cena po slevě</th>
               <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Ks</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Celkem</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;">Celkem</th>
             </tr>`;
 
       items.forEach(([key, item]) => {
@@ -63,9 +65,15 @@ export const generateEmailOffer = async ({
           <tr>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.code}</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatPrice(priceAfterDiscount)} Kč</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.quantity}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${formatPrice(itemTotal)} Kč</strong></td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;">${formatPrice(
+              priceAfterDiscount
+            )} Kč</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
+              item.quantity
+            }</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;"><strong>${formatPrice(
+              itemTotal
+            )} Kč</strong></td>
           </tr>`;
       });
 
@@ -88,9 +96,9 @@ export const generateEmailOffer = async ({
             <tr style="background: #f0f0f0;">
               <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Kód</th>
               <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Popis</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Cena po slevě</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;">Cena po slevě</th>
               <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Ks</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Celkem</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;">Celkem</th>
             </tr>`;
 
       items.forEach(([key, item]) => {
@@ -101,9 +109,15 @@ export const generateEmailOffer = async ({
           <tr>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.code}</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatPrice(priceAfterDiscount)} Kč</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.quantity}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${formatPrice(itemTotal)} Kč</strong></td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;">${formatPrice(
+              priceAfterDiscount
+            )} Kč</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
+              item.quantity
+            }</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;"><strong>${formatPrice(
+              itemTotal
+            )} Kč</strong></td>
           </tr>`;
       });
 
@@ -123,7 +137,7 @@ export const generateEmailOffer = async ({
         <table style="width: 100%; border-collapse: collapse;">
           <tr style="background: #f0f0f0;">
             <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Popis</th>
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Cena za jednotku</th>
+                          <th style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;">Cena za jednotku</th>
             <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Počet</th>
             <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Celkem</th>
           </tr>`;
@@ -134,9 +148,15 @@ export const generateEmailOffer = async ({
       emailHtml += `
         <tr>
           <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-          <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatPrice(item.price)} Kč</td>
-          <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.quantity}</td>
-          <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${formatPrice(itemTotal)} Kč</strong></td>
+                     <td style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;">${formatPrice(
+                       item.price
+                     )} Kč</td>
+          <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
+            item.quantity
+          }</td>
+                     <td style="border: 1px solid #ddd; padding: 8px; text-align: right; white-space: nowrap;"><strong>${formatPrice(
+                       itemTotal
+                     )} Kč</strong></td>
         </tr>`;
     });
 
@@ -150,27 +170,39 @@ export const generateEmailOffer = async ({
       <table style="width: 100%;">
         <tr>
           <td style="padding: 8px; font-weight: bold;">Tepelné čerpadlo včetně rozvaděče/hydromodulu</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${formatPrice(heatPumpTotal)} Kč</td>
+                     <td style="padding: 8px; text-align: right; font-weight: bold; white-space: nowrap;">${formatPrice(
+                       heatPumpTotal
+                     )} Kč</td>
         </tr>
         <tr>
           <td style="padding: 8px; font-weight: bold;">Příslušenství</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${formatPrice(accessoriesTotal)} Kč</td>
+                     <td style="padding: 8px; text-align: right; font-weight: bold; white-space: nowrap;">${formatPrice(
+                       accessoriesTotal
+                     )} Kč</td>
         </tr>
         <tr>
           <td style="padding: 8px; font-weight: bold;">Práce a instalační materiál</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${formatPrice(workTotal)} Kč</td>
+                     <td style="padding: 8px; text-align: right; font-weight: bold; white-space: nowrap;">${formatPrice(
+                       workTotal
+                     )} Kč</td>
         </tr>
         <tr style="border-top: 2px solid #333;">
           <td style="padding: 8px; font-weight: bold;">Mezisoučet</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${formatPrice(subtotal)} Kč</td>
+                     <td style="padding: 8px; text-align: right; font-weight: bold; white-space: nowrap;">${formatPrice(
+                       subtotal
+                     )} Kč</td>
         </tr>
         <tr>
           <td style="padding: 8px;">DPH ${(vat * 100).toFixed(0)}%</td>
-          <td style="padding: 8px; text-align: right;">${formatPrice(vatAmount)} Kč</td>
+                     <td style="padding: 8px; text-align: right; white-space: nowrap;">${formatPrice(
+                       vatAmount
+                     )} Kč</td>
         </tr>
         <tr style="background: #667eea; color: white;">
           <td style="padding: 12px; font-weight: bold; font-size: 1.2em;">CELKEM K ÚHRADĚ</td>
-          <td style="padding: 12px; text-align: right; font-weight: bold; font-size: 1.2em;">${formatPrice(total)} Kč</td>
+                     <td style="padding: 12px; text-align: right; font-weight: bold; font-size: 1.2em; white-space: nowrap;">${formatPrice(
+                       total
+                     )} Kč</td>
         </tr>
       </table>
     </div>
@@ -190,38 +222,38 @@ export const copyHtmlToClipboard = async (html) => {
   try {
     // Moderní způsob - Clipboard API s HTML
     if (navigator.clipboard && window.ClipboardItem) {
-      const blob = new Blob([html], { type: 'text/html' });
-      const clipboardItem = new window.ClipboardItem({ 'text/html': blob });
+      const blob = new Blob([html], { type: "text/html" });
+      const clipboardItem = new window.ClipboardItem({ "text/html": blob });
       await navigator.clipboard.write([clipboardItem]);
       return true;
     }
   } catch (err) {
-    console.log('Moderní clipboard API selhalo, zkouším alternativu...', err);
+    console.log("Moderní clipboard API selhalo, zkouším alternativu...", err);
   }
 
   // Alternativa - vytvoření dočasného elementu
   try {
-    const tempDiv = document.createElement('div');
-    tempDiv.style.position = 'fixed';
-    tempDiv.style.pointerEvents = 'none';
-    tempDiv.style.opacity = '0';
+    const tempDiv = document.createElement("div");
+    tempDiv.style.position = "fixed";
+    tempDiv.style.pointerEvents = "none";
+    tempDiv.style.opacity = "0";
     tempDiv.innerHTML = html;
     document.body.appendChild(tempDiv);
 
     const range = document.createRange();
     range.selectNodeContents(tempDiv);
-    
+
     const selection = window.getSelection();
     selection.removeAllRanges();
     selection.addRange(range);
-    
-    document.execCommand('copy');
+
+    document.execCommand("copy");
     selection.removeAllRanges();
     document.body.removeChild(tempDiv);
-    
+
     return true;
   } catch (err) {
-    console.error('Kopírování selhalo:', err);
+    console.error("Kopírování selhalo:", err);
     return false;
   }
 };

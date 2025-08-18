@@ -14,7 +14,11 @@ import ActionPanel from "../components/ActionPanel";
 import { defaultPriceList } from "../data/priceList";
 import { defaultWorkPrices } from "../data/workPrices";
 import { calculateTotals } from "../utils/calculations";
-import { saveQuoteToFile, loadQuoteFromFile, createQuoteData } from "../utils/fileOperations";
+import {
+  saveQuoteToFile,
+  loadQuoteFromFile,
+  createQuoteData,
+} from "../utils/fileOperations";
 
 function App() {
   // State pro základní údaje
@@ -22,8 +26,10 @@ function App() {
   const [projectName, setProjectName] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerType, setCustomerType] = useState("koncovy");
-  const [offerDate, setOfferDate] = useState(new Date().toISOString().split("T")[0]);
-  
+  const [offerDate, setOfferDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+
   // State pro výběry
   const [selectedItems, setSelectedItems] = useState({});
   const [selectedWork, setSelectedWork] = useState({});
@@ -38,7 +44,7 @@ function App() {
   // Zjednodušený generateOffer
   const generateOffer = async () => {
     const totals = calculateTotals(selectedItems, selectedWork, customerType);
-    
+
     let emailHtml = `CENOVÁ NABÍDKA - ${projectName}
     
 Zákazník: ${customerName}
@@ -103,7 +109,8 @@ CELKEM K ÚHRADĚ: ${Math.round(totals.total).toLocaleString("cs-CZ")} Kč`;
   };
 
   const toggleWork = (index) => {
-    const workList = heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
+    const workList =
+      heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
     const work = workList[index];
     const key = `work-${index}`;
 
@@ -113,26 +120,37 @@ CELKEM K ÚHRADĚ: ${Math.round(totals.total).toLocaleString("cs-CZ")} Kč`;
         delete newItems[key];
         return newItems;
       } else {
-        return { ...prev, [key]: { name: work.name, price: work.price, quantity: 1 } };
+        return {
+          ...prev,
+          [key]: { name: work.name, price: work.price, quantity: 1 },
+        };
       }
     });
   };
 
   const updateWorkQuantity = (index, quantity) => {
-    const workList = heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
+    const workList =
+      heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
     const work = workList[index];
     const key = `work-${index}`;
     const newQuantity = parseInt(quantity) || 0;
 
     setSelectedWork((prev) => {
       const currentPrice = prev[key]?.price || work.price;
-      
+
       if (newQuantity === 0) {
         const newItems = { ...prev };
         delete newItems[key];
         return newItems;
       } else {
-        return { ...prev, [key]: { name: work.name, price: currentPrice, quantity: newQuantity } };
+        return {
+          ...prev,
+          [key]: {
+            name: work.name,
+            price: currentPrice,
+            quantity: newQuantity,
+          },
+        };
       }
     });
   };
@@ -141,7 +159,13 @@ CELKEM K ÚHRADĚ: ${Math.round(totals.total).toLocaleString("cs-CZ")} Kč`;
     const key = `work-${index}`;
     setSelectedWork((prev) => {
       if (prev[key]) {
-        return { ...prev, [key]: { ...prev[key], price: newPrice } };
+        return {
+          ...prev,
+          [key]: {
+            ...prev[key],
+            price: newPrice === "" ? "" : newPrice,
+          },
+        };
       }
       return prev;
     });
@@ -149,8 +173,13 @@ CELKEM K ÚHRADĚ: ${Math.round(totals.total).toLocaleString("cs-CZ")} Kč`;
 
   const saveQuote = () => {
     const quoteData = createQuoteData({
-      projectName, customerName, customerType, offerDate,
-      selectedItems, selectedWork, heatPumpType,
+      projectName,
+      customerName,
+      customerType,
+      offerDate,
+      selectedItems,
+      selectedWork,
+      heatPumpType,
     });
     saveQuoteToFile(quoteData, projectName, customerName);
   };
@@ -158,13 +187,19 @@ CELKEM K ÚHRADĚ: ${Math.round(totals.total).toLocaleString("cs-CZ")} Kč`;
   const loadQuote = (event) => {
     const file = event.target.files[0];
     loadQuoteFromFile(file, (quoteData) => {
-      if (quoteData.projectName !== undefined) setProjectName(quoteData.projectName);
-      if (quoteData.customerName !== undefined) setCustomerName(quoteData.customerName);
-      if (quoteData.customerType !== undefined) setCustomerType(quoteData.customerType);
+      if (quoteData.projectName !== undefined)
+        setProjectName(quoteData.projectName);
+      if (quoteData.customerName !== undefined)
+        setCustomerName(quoteData.customerName);
+      if (quoteData.customerType !== undefined)
+        setCustomerType(quoteData.customerType);
       if (quoteData.offerDate !== undefined) setOfferDate(quoteData.offerDate);
-      if (quoteData.selectedItems !== undefined) setSelectedItems(quoteData.selectedItems);
-      if (quoteData.selectedWork !== undefined) setSelectedWork(quoteData.selectedWork);
-      if (quoteData.heatPumpType !== undefined) setHeatPumpType(quoteData.heatPumpType);
+      if (quoteData.selectedItems !== undefined)
+        setSelectedItems(quoteData.selectedItems);
+      if (quoteData.selectedWork !== undefined)
+        setSelectedWork(quoteData.selectedWork);
+      if (quoteData.heatPumpType !== undefined)
+        setHeatPumpType(quoteData.heatPumpType);
     });
     event.target.value = "";
   };

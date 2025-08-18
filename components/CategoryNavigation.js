@@ -1,6 +1,6 @@
 // Komponenta pro stromovou navigaci kategorií
-import React from 'react';
-import { formatPrice } from '../utils/calculations';
+import React from "react";
+import { formatPrice } from "../utils/calculations";
 
 const CategoryNavigation = ({
   heatPumpType,
@@ -97,9 +97,8 @@ const CategoryNavigation = ({
           <h4 className="text-sm font-medium text-green-800 mb-2">
             ✓ Vybrané položky (
             {
-              Object.values(selectedItems).filter(
-                (item) => item.quantity > 0
-              ).length
+              Object.values(selectedItems).filter((item) => item.quantity > 0)
+                .length
             }
             ):
           </h4>
@@ -115,9 +114,8 @@ const CategoryNavigation = ({
                   {item.code} ({item.quantity}x)
                 </span>
               ))}
-            {Object.values(selectedItems).filter(
-              (item) => item.quantity > 0
-            ).length > 6 && (
+            {Object.values(selectedItems).filter((item) => item.quantity > 0)
+              .length > 6 && (
               <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
                 +
                 {Object.values(selectedItems).filter(
@@ -135,9 +133,7 @@ const CategoryNavigation = ({
         {/* Krok 1: Výběr hlavní kategorie */}
         {!selectedCategory && (
           <div className="space-y-3">
-            <h3 className="font-medium text-gray-700">
-              1. Vyberte kategorii:
-            </h3>
+            <h3 className="font-medium text-gray-700">1. Vyberte kategorii:</h3>
             <div className="grid gap-3">
               {Object.entries(getCategoryStructure()).map(
                 ([categoryKey, categoryData]) => (
@@ -150,8 +146,8 @@ const CategoryNavigation = ({
                       {categoryData.name}
                     </div>
                     <div className="text-sm text-gray-500 mt-1">
-                      {Object.keys(categoryData.subcategories).length}{" "}
-                      skupin dostupných
+                      {Object.keys(categoryData.subcategories).length} skupin
+                      dostupných
                     </div>
                   </button>
                 )
@@ -177,8 +173,7 @@ const CategoryNavigation = ({
             </div>
             <div className="grid gap-3">
               {Object.entries(
-                getCategoryStructure()[selectedCategory]
-                  ?.subcategories || {}
+                getCategoryStructure()[selectedCategory]?.subcategories || {}
               ).map(([subKey, subData]) => (
                 <button
                   key={subKey}
@@ -210,8 +205,9 @@ const CategoryNavigation = ({
               <h3 className="font-medium text-gray-700">
                 3. Produkty v skupině "
                 {
-                  getCategoryStructure()[selectedCategory]
-                    ?.subcategories[selectedSubcategory]?.name
+                  getCategoryStructure()[selectedCategory]?.subcategories[
+                    selectedSubcategory
+                  ]?.name
                 }
                 ":
               </h3>
@@ -257,8 +253,7 @@ const CategoryNavigation = ({
                           <div className="flex-1">
                             <div className="text-sm">{item.name}</div>
                             <div className="text-xs text-gray-500">
-                              {item.code} -{" "}
-                              {formatPrice(item.price)} Kč
+                              {item.code} - {formatPrice(item.price)} Kč
                             </div>
                           </div>
                           {isSelected && (
@@ -273,7 +268,7 @@ const CategoryNavigation = ({
                                   e.target.value
                                 )
                               }
-                              className="w-16 px-2 py-1 border rounded"
+                              className="w-16 px-2 py-1 border rounded text-gray-900"
                             />
                           )}
                         </div>

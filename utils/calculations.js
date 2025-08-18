@@ -31,13 +31,16 @@ export const calculateTotals = (selectedItems, selectedWork, customerType) => {
     .forEach(([key, item]) => {
       const priceAfterDiscount = item.price * (1 - discount);
       const total = priceAfterDiscount * item.quantity;
-      
+
       // Rozdělení do kategorií podle typu
-      const category = key.split('-')[0];
+      const category = key.split("-")[0];
       const heatPumpCategories = ["A", "B", "D", "E", "F", "G", "H"];
       const controlCategories = ["C1", "C2", "J"];
-      
-      if (heatPumpCategories.includes(category) || controlCategories.includes(category)) {
+
+      if (
+        heatPumpCategories.includes(category) ||
+        controlCategories.includes(category)
+      ) {
         heatPumpTotal += total;
       } else {
         accessoriesTotal += total;
@@ -63,7 +66,7 @@ export const calculateTotals = (selectedItems, selectedWork, customerType) => {
     vatAmount,
     total,
     discount,
-    vat
+    vat,
   };
 };
 

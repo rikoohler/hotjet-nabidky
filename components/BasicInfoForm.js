@@ -1,5 +1,5 @@
 // Komponenta pro základní údaje o nabídce
-import React from 'react';
+import React from "react";
 
 const BasicInfoForm = ({
   projectName,
@@ -23,48 +23,48 @@ const BasicInfoForm = ({
       <div className="space-y-3">
         {/* První řádek - Název akce napříč */}
         <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-medium text-gray-900 mb-1">
             Název akce
           </label>
           <input
             type="text"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-2 py-1.5 text-sm text-gray-900 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
             placeholder="např. Rodinný dům Novákovi"
           />
         </div>
-        
+
         {/* Druhý řádek - Zákazník a datum v jednom řádku */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-gray-900 mb-1">
               Zákazník
             </label>
             <input
               type="text"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-2 py-1.5 text-sm text-gray-900 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
               placeholder="např. Jan Novák"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-medium text-gray-900 mb-1">
               Datum
             </label>
             <input
               type="date"
               value={offerDate}
               onChange={(e) => setOfferDate(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-2 py-1.5 text-sm text-gray-900 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
-        
+
         {/* Třetí řádek - Typ zákazníka */}
         <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-medium text-gray-900 mb-1">
             Typ zákazníka
           </label>
           <div className="grid grid-cols-3 gap-1">
@@ -103,10 +103,10 @@ const BasicInfoForm = ({
             </button>
           </div>
         </div>
-        
+
         {/* Čtvrtý řádek - Typ TČ */}
         <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-medium text-gray-900 mb-1">
             Typ tepelného čerpadla
           </label>
           <div className="grid grid-cols-2 gap-2">

@@ -1,12 +1,8 @@
 // Komponenta pro panel akcí (generování nabídky, save/load)
-import React from 'react';
-import { FileText, Save, Upload } from 'lucide-react';
+import React from "react";
+import { FileText, Save, Upload } from "lucide-react";
 
-const ActionPanel = ({
-  generateOffer,
-  saveQuote,
-  loadQuote,
-}) => {
+const ActionPanel = ({ generateOffer, saveQuote, loadQuote }) => {
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
       <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
