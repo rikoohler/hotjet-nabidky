@@ -1,858 +1,75 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import {
-  Download,
-  Upload,
-  Save,
-  Edit,
-  Trash2,
-  Plus,
-  FileText,
-  Settings,
-  Package,
-  Calculator,
-  Check,
-} from "lucide-react";
+import React, { useState } from "react";
+import { Calculator, Edit } from "lucide-react";
 
-// Výchozí data - struktura ceníku
-const defaultPriceList = {
-  A: {
-    name: "Vzduch-voda, venkovní monoblok, R454b",
-    description:
-      "⚡ Smart Grid Ready a podpora fotovoltaiky\n🔄 Hybridizace - funkce v regulaci\n🔇 Systém aktivního potlačení hluku\n🔧 Scroll kompresor Copeland\n🌿 Bezpečné chladivo R454B",
-    items: [
-      {
-        code: "HJZETXE07",
-        name: "HOTJET 7ZETXe - topení/chlazení - pro TZ 4-8kW",
-        price: 160194,
-      },
-      {
-        code: "HJZETXE10",
-        name: "HOTJET 10ZETXe - topení/chlazení, 400V - pro TZ 5-15kW",
-        price: 167922,
-      },
-      {
-        code: "HJZETXE15",
-        name: "HOTJET 15ZETXe - topení/chlazení, 400V - pro TZ 10-20kW",
-        price: 186104,
-      },
-    ],
-  },
-  B: {
-    name: "Vzduch-voda, venkovní monoblok, R290 (propan)",
-    description:
-      "🌱 Ekologické chladivo R290\n⚡ Vysoká účinnost\n🔇 Nízká hlučnost",
-    items: [
-      {
-        code: "HJZETXP07",
-        name: "HOTJET 7ZETXp - R290 - pro TZ 4-8kW",
-        price: 163804,
-      },
-      {
-        code: "HJZETXP10",
-        name: "HOTJET 10ZETXp - R290, 400V - pro TZ 5-15kW",
-        price: 176575,
-      },
-      {
-        code: "HJZETXP15",
-        name: "HOTJET 15ZETXp - R290, 400V - pro TZ 10-20kW",
-        price: 206157,
-      },
-      {
-        code: "HJZETXP20",
-        name: "HOTJET 20ZETXp - R290, 400V - pro TZ 15-25kW",
-        price: 234216,
-      },
-    ],
-  },
-  C1: {
-    name: "ROZVADĚČ",
-    description:
-      "🧠 Inteligentní regulátor Siemens\n🏠 Celokovový externí rozvaděč\n🌡️ Venkovní čidlo\n💧 Úsporné oběhové čerpadlo\n🌐 Webserver pro ovládání",
-    items: [
-      {
-        code: "RZ107",
-        name: "Rozvaděč k tepelnému čerpadlu 7ZETXe/p",
-        price: 21579,
-      },
-      {
-        code: "RZ115",
-        name: "Rozvaděč k tepelnému čerpadlu 10/15ZETXe/p",
-        price: 21579,
-      },
-    ],
-  },
-  C2: {
-    name: "HYDROMODUL",
-    description:
-      "🔧 Kompletní rozvaděč s regulátorem\n⚡ Interní elektrokotel 7,5kW\n🔄 3-cestný ventil\n💧 Úsporné čerpadlo\n📱 Webserver a aplikace",
-    items: [
-      {
-        code: "HMD07",
-        name: "Hydromodul k tepelnému čerpadlu 7ZETXe/p",
-        price: 45525,
-      },
-      {
-        code: "HMD115",
-        name: "Hydromodul k tepelnému čerpadlu 10,15ZETXe/p, 20ZETXp",
-        price: 45525,
-      },
-    ],
-  },
-  D: {
-    name: "Vzduch-voda, INTERNÍ monoblok, R454b",
-    description:
-      "Vnitřní instalace\nIntegrovaný rozvaděč\nElektrokotel 7,5kW\n3-cestný ventil",
-    items: [
-      {
-        code: "HJZETXI07",
-        name: "HOTJET 7ZETXi - topení/chlazení - pro TZ 4-8kW",
-        price: 209378,
-      },
-      {
-        code: "HJZETXI10",
-        name: "HOTJET 10ZETXi - topení/chlazení, 400V - pro TZ 5-15kW",
-        price: 220248,
-      },
-      {
-        code: "HJZETXI15",
-        name: "HOTJET 15ZETXi - topení/chlazení, 400V - pro TZ 10-20kW",
-        price: 241430,
-      },
-    ],
-  },
-  E: {
-    name: "Vzduch-voda, VNITŘNÍ monoblok",
-    description: "Kompaktní řešení\nMontáž na zeď jako plynový kotel",
-    items: [
-      {
-        code: "HJMINI5AI",
-        name: "Mini 5Ai - TČ k pověšení na zeď do 4kW TZ",
-        price: 110837,
-      },
-    ],
-  },
-  F: {
-    name: "Voda-voda tepelná čerpadla",
-    description: "Vysoká účinnost\nAktivní chlazení\nElektrokotel 7,5kW",
-    items: [
-      {
-        code: "HJWX07cx",
-        name: "HOTJET 7WX voda-voda, aktivní chl., koax. výparník",
-        price: 166487,
-      },
-      {
-        code: "HJWX10cx",
-        name: "HOTJET 10WX voda-voda, aktivní chl., koax. výparník",
-        price: 169286,
-      },
-      {
-        code: "HJWX15cx",
-        name: "HOTJET 15WX voda-voda, aktivní ch., koax. výparník",
-        price: 182495,
-      },
-    ],
-  },
-  G: {
-    name: "Země-voda tepelná čerpadla",
-    description:
-      "Smart Grid Ready\nPasivní i aktivní chlazení\nIntegrovaný elektrokotel 7,5kW\nWebserver a aplikace",
-    items: [
-      {
-        code: "HJWX07",
-        name: "HOTJET 7WX země-voda, aktivní chlazení",
-        price: 162058,
-      },
-      {
-        code: "HJWX10",
-        name: "HOTJET 10WX země-voda, aktivní chlazení",
-        price: 164857,
-      },
-      {
-        code: "HJWX15",
-        name: "HOTJET 15WX země-voda, aktivní chlazení",
-        price: 178066,
-      },
-    ],
-  },
-  H: {
-    name: "Vzduch-voda, venkovní monoblok, On/Off, 65°C",
-    description: "Vysokoteplotní tepelná čerpadla\nVhodné pro rekonstrukce",
-    items: [
-      { code: "HJONE2H20", name: "HOTJET 20ONE2", price: 170620 },
-      { code: "HJONE2H25", name: "HOTJET 25ONE2", price: 266934 },
-      { code: "HJONE2H35", name: "HOTJET 35ONE2", price: 338890 },
-      { code: "HJONE2H45", name: "HOTJET 45ONE2", price: 346507 },
-      { code: "HJONE2H55", name: "HOTJET 55ONE2", price: 366816 },
-    ],
-  },
-  J: {
-    name: "Rozvaděč pro venkovní jednotky ONE2",
-    description: "Rozvaděč s regulací",
-    items: [
-      {
-        code: "RZONE2",
-        name: "Rozvaděč s regulací pro 25-45 ONE2",
-        price: 22653,
-      },
-    ],
-  },
-  M: {
-    name: "Různé příslušenství",
-    description: "",
-    items: [
-      {
-        code: "RQ55.301",
-        name: "Drátové prostorové čidlo s tlačítkem pro chlazení",
-        price: 2990,
-      },
-      {
-        code: "RQ58.301",
-        name: "Bezdrátové prostorové čidlo s tlačítkem pro chlazení",
-        price: 3360,
-      },
-      { code: "RA71.393", name: "Bezdrátový přijímač, dosah 30m", price: 2986 },
-      { code: "RGQZ36526", name: "Siemens čidlo teploty kabel 6m", price: 450 },
-      {
-        code: "3CV",
-        name: '3-cestný rozdělovací ventil 1" pro boiler, bazén',
-        price: 2390,
-      },
-      { code: "EKT75", name: "Elektrokotel trubkový 7,5kW", price: 7875 },
-      {
-        code: "GPA20-9",
-        name: "Čerpadlo Hotjet GPA20-9H-130, řízení PWM",
-        price: 3000,
-      },
-      {
-        code: "GPA25-11",
-        name: "Čerpadlo Hotjet GPA25-11H-130, řízení PWM",
-        price: 4110,
-      },
-      {
-        code: "P1ZETXE",
-        name: "Podstavec pod tepelné čerpadlo + silentbloky",
-        price: 3600,
-      },
-    ],
-  },
-  N: {
-    name: "Průtokový ohřev TV",
-    description:
-      "🔵 Dokonalá hygiena a čistota\n• Vždy čerstvá teplá voda ohřívaná v moderní výměníkové stanici\n• Žádné usazeniny či bakterie - voda se neukládá v bojleru\n• Bez nutnosti pravidelné dezinfekce proti legionelle\n• Prémiové materiály: nerezový výměník a měděné rozvody\n\n⚡ Maximální výkon a efektivita\n• Plný výkon tepelného čerpadla bez omezení výměníkem\n• Neomezená kapacita díky možnosti rozšíření o další nádrže\n• Profesionální řešení inspirované systémy z bytových domů\n\n🛠️ Praktické benefity\n• Snadná údržba - všechny komponenty přístupné zvenčí\n• Nadstandardní životnost ve srovnání s klasickými bojlery\n• Flexibilní instalace s možností budoucího rozšíření",
-    items: [
-      {
-        code: "FW300+",
-        name: "Průtokový ohřev TV 300l s výkonem 21l/min",
-        price: 49707,
-      },
-      {
-        code: "FW500+",
-        name: "Průtokový ohřev TV 500l s výkonem 21l/min",
-        price: 51284,
-      },
-      {
-        code: "FW800+",
-        name: "Průtokový ohřev TV 800l s výkonem 21l/min",
-        price: 62527,
-      },
-      {
-        code: "FW1000+",
-        name: "Průtokový ohřev TV 1000l s výkonem 21l/min",
-        price: 66690,
-      },
-    ],
-  },
-  O: {
-    name: "Kombinované nádrže",
-    description: "",
-    items: [
-      {
-        code: "BOLLY250",
-        name: "Kombinovaná nádrž pro TV 235l s výměníkem 2,1m2",
-        price: 54250,
-      },
-      {
-        code: "BOLLY300",
-        name: "Kombinovaná nádrž pro TV 291l s výměníkem 3,4m2",
-        price: 57700,
-      },
-      {
-        code: "BOLLY500",
-        name: "Kombinovaná nádrž pro TV 498l s výměníkem 5,4m2",
-        price: 77950,
-      },
-    ],
-  },
-  P: {
-    name: "Boilery s výměníkem",
-    description: "",
-    items: [
-      {
-        code: "B200",
-        name: "Boiler 200 - objem 167l, výměník 2,4m2",
-        price: 26000,
-      },
-      {
-        code: "B300",
-        name: "Boiler 300 - objem 238l, výměník 3,1m2",
-        price: 31400,
-      },
-      {
-        code: "B500",
-        name: "Boiler 500 - objem 426l, výměník 4,4m2",
-        price: 45318,
-      },
-    ],
-  },
-  Q: {
-    name: "VYROVNÁVACÍ ZÁSOBNÍKY (AKUMULACE)",
-    description: "",
-    items: [
-      {
-        code: "BF60",
-        name: "Zásobník 60l - výška 609mm, průměr 505mm",
-        price: 7800,
-      },
-      {
-        code: "BF120",
-        name: "Zásobník 120l - výška 1000mm, průměr 505mm",
-        price: 10140,
-      },
-      {
-        code: "BF200",
-        name: "Zásobník 200l - výška 1369mm, průměr 634mm",
-        price: 17056,
-      },
-      {
-        code: "BF300",
-        name: "Zásobník 300l - výška 1405mm, průměr 732mm",
-        price: 20748,
-      },
-    ],
-  },
-  R: {
-    name: "FANCOILY",
-    description: "Doplnění nebo náhrada radiátorů pro topení i chlazení",
-    items: [
-      {
-        code: "ACFXVA230",
-        name: "Nástěnný Fan coil FX-VA 230 DX (40°C, 1270-1630W)",
-        price: 10820,
-      },
-      {
-        code: "ACFXVA630",
-        name: "Nástěnný Fan coil FX-VA 630 DX (40°C, 2610-3150W)",
-        price: 14952,
-      },
-      {
-        code: "ACFXVA1230",
-        name: "Nástěnný Fan coil FX-VA 1230 DX (40°C, 6390-7220W)",
-        price: 21100,
-      },
-    ],
-  },
-  S: {
-    name: "Regulace",
-    description: "",
-    items: [
-      {
-        code: "AVS55.196",
-        name: "Rozšiřující modul pro RSV21 (4x teplot. čidlo, 3x 0-10V)",
-        price: 2205,
-      },
-      {
-        code: "AVS55.199",
-        name: "Rozšiřující modul pro RSV21 (4x teplot. čidlo, EEV)",
-        price: 2300,
-      },
-      {
-        code: "AVS82.496",
-        name: "Plochý kabel AVS82.496 pro AVS55 do RVS21",
-        price: 221,
-      },
-    ],
-  },
-  T: {
-    name: "OHŘEV POTRUBÍ ODVODU KONDENZÁTU",
-    description: "",
-    items: [
-      { code: "OOK_2", name: "Ohřev odvodu kondenzátu 2m 80W", price: 840 },
-      { code: "OOK_3", name: "Ohřev odvodu kondenzátu 3m 120W", price: 945 },
-      { code: "OOK_6", name: "Ohřev odvodu kondenzátu 6m 240W", price: 1365 },
-      { code: "OOK_9", name: "Ohřev odvodu kondenzátu 9m 360W", price: 2310 },
-    ],
-  },
-  Z: {
-    name: "Záruky",
-    description: "",
-    items: [
-      { code: "W5Y", name: "Prodloužená záruka na 5 let", price: 5240 },
-      { code: "W10Y", name: "Prodloužená záruka na 10 let", price: 8390 },
-    ],
-  },
-};
+// Import komponent
+import BasicInfoForm from "../components/BasicInfoForm";
+import CategoryNavigation from "../components/CategoryNavigation";
+import WorkSelection from "../components/WorkSelection";
+import SelectedItemsList from "../components/SelectedItemsList";
+import ActionPanel from "../components/ActionPanel";
 
-const defaultWorkPrices = {
-  zemeVoda: [
-    {
-      name: "Dopojení zemního kolektoru na TČ, plnění, zkoušení",
-      price: 10000,
-    },
-    { name: "INSTALAČNÍ MATERIÁL topení, voda", price: 15000 },
-    { name: "INSTALAČNÍ MATERIÁL ELEKTRO - kabeláž", price: 5000 },
-    { name: "PRÁCE - instalace tepelného čerpadla", price: 18000 },
-    { name: "KONTROLA INSTALACE A UVEDENÍ DO PROVOZU", price: 6000 },
-    { name: "DOPRAVA tepelného čerpadla a materiálu", price: 1500 },
-    { name: "Demontáž a likvidace kotle na tuhá paliva", price: 5000 },
-    { name: "Zpracování agendy dotací", price: 4800 },
-  ],
-  vzduchVoda: [
-    { name: "Základ pro umístění TČ na terén", price: 6500 },
-    { name: "INSTALAČNÍ MATERIÁL topení, voda", price: 15000 },
-    { name: "INSTALAČNÍ MATERIÁL ELEKTRO - kabeláž", price: 5000 },
-    { name: "PRÁCE - instalace tepelného čerpadla", price: 17500 },
-    { name: "KONTROLA INSTALACE A UVEDENÍ DO PROVOZU", price: 6000 },
-    { name: "DOPRAVA tepelného čerpadla a materiálu", price: 1500 },
-    { name: "Demontáž a likvidace kotle na tuhá paliva", price: 5000 },
-    { name: "Zpracování agendy dotací", price: 4800 },
-  ],
-};
+// Import dat a utilit
+import { defaultPriceList } from "../data/priceList";
+import { defaultWorkPrices } from "../data/workPrices";
+import { calculateTotals } from "../utils/calculations";
+import { saveQuoteToFile, loadQuoteFromFile, createQuoteData } from "../utils/fileOperations";
 
 function App() {
+  // State pro základní údaje
   const [activeTab, setActiveTab] = useState("generator");
-  const [priceList, setPriceList] = useState(defaultPriceList);
-  const [workPrices, setWorkPrices] = useState(defaultWorkPrices);
-  const [editMode, setEditMode] = useState(false);
-
-  // State pro generátor nabídek
   const [projectName, setProjectName] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerType, setCustomerType] = useState("koncovy");
-  const [offerDate, setOfferDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [offerDate, setOfferDate] = useState(new Date().toISOString().split("T")[0]);
+  
+  // State pro výběry
   const [selectedItems, setSelectedItems] = useState({});
   const [selectedWork, setSelectedWork] = useState({});
   const [heatPumpType, setHeatPumpType] = useState("vzduch");
-  const [selectedCategory, setSelectedCategory] = useState(null); // Pro navigaci kategorií
-  const [selectedSubcategory, setSelectedSubcategory] = useState(null); // Pro navigaci podkategorií
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
 
-  // Výpočet slevy podle typu zákazníka
-  const getDiscount = () => {
-    switch (customerType) {
-      case "koncovy":
-        return 0.1;
-      case "montazni":
-        return 0.37;
-      case "montazniPlus":
-        return 0.42;
-      default:
-        return 0;
-    }
-  };
+  // State pro data
+  const [priceList] = useState(defaultPriceList);
+  const [workPrices] = useState(defaultWorkPrices);
 
-  // Export dat do JSON
-  const exportData = () => {
-    const dataToExport = {
-      priceList,
-      workPrices,
-      version: "1.0",
-      exportDate: new Date().toISOString(),
-    };
-    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `hotjet-data-${new Date().toISOString().split("T")[0]}.json`;
-    a.click();
-  };
-
-  // Import dat z JSON
-  const importData = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = JSON.parse(e.target.result);
-          if (data.priceList) setPriceList(data.priceList);
-          if (data.workPrices) setWorkPrices(data.workPrices);
-          alert("Data byla úspěšně načtena!");
-        } catch (error) {
-          alert("Chyba při načítání dat: " + error.message);
-        }
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  // Nahraď celou funkci generateOffer() touto verzí:
-
+  // Zjednodušený generateOffer
   const generateOffer = async () => {
-    const discount = getDiscount();
-    const vat = customerType === "koncovy" ? 0.12 : 0.21;
-
-    let heatPumpTotal = 0;
-    let accessoriesTotal = 0;
-    let workTotal = 0;
-
-    // HTML pro email - jednodušší styling který funguje v emailových klientech
-    let emailHtml = `
-<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
-  <h1 style="color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px;">CENOVÁ NABÍDKA</h1>
-  
-  <div style="margin: 20px 0;">
-    <p><strong>Akce:</strong> ${projectName}</p>
-    <p><strong>Zákazník:</strong> ${customerName}</p>
-    <p><strong>Datum vystavení:</strong> ${new Date(
-      offerDate
-    ).toLocaleDateString("cs-CZ")}</p>
-    <p><strong>Platnost nabídky:</strong> 30 dní</p>
-  </div>
-  
-  <hr style="border: 1px solid #ddd;">
-`;
-
-    // Zpracování tepelných čerpadel a příslušenství
-    const heatPumpCategories = ["A", "B", "D", "E", "F", "G", "H"];
-    const controlCategories = ["C1", "C2", "J"];
-
-    // Nejdříve tepelná čerpadla s rozvaděči
-    [...heatPumpCategories, ...controlCategories].forEach((cat) => {
-      const items = Object.entries(selectedItems).filter(
-        ([key, val]) => key.startsWith(cat + "-") && val.quantity > 0
-      );
-
-      if (items.length > 0) {
-        emailHtml += `
-        <div style="margin: 30px 0;">
-          <h2 style="color: #333; background: #f5f5f5; padding: 10px;">${priceList[cat].name}</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr style="background: #f0f0f0;">
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Kód</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Popis</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Cena po slevě</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Ks</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Celkem</th>
-            </tr>`;
-
-        items.forEach(([key, item]) => {
-          const priceAfterDiscount = item.price * (1 - discount);
-          const total = priceAfterDiscount * item.quantity;
-          if (controlCategories.includes(cat)) {
-            heatPumpTotal += total;
-          } else if (heatPumpCategories.includes(cat)) {
-            heatPumpTotal += total;
-          } else {
-            accessoriesTotal += total;
-          }
-
-          emailHtml += `
-          <tr>
-            <td style="border: 1px solid #ddd; padding: 8px;">${item.code}</td>
-            <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${Math.round(
-              priceAfterDiscount
-            ).toLocaleString("cs-CZ")} Kč</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
-              item.quantity
-            }</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${Math.round(
-              total
-            ).toLocaleString("cs-CZ")} Kč</strong></td>
-          </tr>`;
-        });
-
-        emailHtml += `</table>`;
-
-        if (priceList[cat].description) {
-          emailHtml += `
-          <div style="background: #e6f2ff; padding: 10px; margin: 10px 0; border-left: 3px solid #0066cc;">
-            ${priceList[cat].description.replace(/\n/g, "<br>")}
-          </div>`;
-        }
-
-        emailHtml += `</div>`;
-      }
-    });
-
-    // Příslušenství
-    const accessoryCategories = Object.keys(priceList).filter(
-      (cat) =>
-        !heatPumpCategories.includes(cat) && !controlCategories.includes(cat)
-    );
-
-    accessoryCategories.forEach((cat) => {
-      const items = Object.entries(selectedItems).filter(
-        ([key, val]) => key.startsWith(cat + "-") && val.quantity > 0
-      );
-
-      if (items.length > 0) {
-        emailHtml += `
-        <div style="margin: 30px 0;">
-          <h2 style="color: #333; background: #f5f5f5; padding: 10px;">${priceList[cat].name}</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr style="background: #f0f0f0;">
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Kód</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Popis</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Cena po slevě</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Ks</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Celkem</th>
-            </tr>`;
-
-        items.forEach(([key, item]) => {
-          const priceAfterDiscount = item.price * (1 - discount);
-          const total = priceAfterDiscount * item.quantity;
-          accessoriesTotal += total;
-
-          emailHtml += `
-          <tr>
-            <td style="border: 1px solid #ddd; padding: 8px;">${item.code}</td>
-            <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${Math.round(
-              priceAfterDiscount
-            ).toLocaleString("cs-CZ")} Kč</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
-              item.quantity
-            }</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${Math.round(
-              total
-            ).toLocaleString("cs-CZ")} Kč</strong></td>
-          </tr>`;
-        });
-
-        emailHtml += `</table></div>`;
-      }
-    });
-
-    // Práce a instalační materiál
-    const workItems = Object.entries(selectedWork).filter(
-      ([key, val]) => val.quantity > 0
-    );
-    if (workItems.length > 0) {
-      emailHtml += `
-      <div style="margin: 30px 0;">
-        <h2 style="color: #333; background: #f5f5f5; padding: 10px;">Práce a instalační materiál</h2>
-        <p style="font-style: italic; color: #666;">Níže je uveden odhad ceny materiálu, který bude vyúčtován dle skutečné spotřeby v nákupních cenách bez DPH + 15%</p>
-        <table style="width: 100%; border-collapse: collapse;">
-          <tr style="background: #f0f0f0;">
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Popis</th>
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Cena za jednotku</th>
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Počet</th>
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Celkem</th>
-          </tr>`;
-
-      workItems.forEach(([key, item]) => {
-        const total = item.price * item.quantity;
-        workTotal += total;
-
-        emailHtml += `
-        <tr>
-          <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-          <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${Math.round(
-            item.price
-          ).toLocaleString("cs-CZ")} Kč</td>
-          <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
-            item.quantity
-          }</td>
-          <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${Math.round(
-            total
-          ).toLocaleString("cs-CZ")} Kč</strong></td>
-        </tr>`;
-      });
-
-      emailHtml += `</table></div>`;
-    }
-
-    // Souhrn
-    const subtotal = heatPumpTotal + accessoriesTotal + workTotal;
-    const vatAmount = subtotal * vat;
-    const total = subtotal + vatAmount;
-
-    emailHtml += `
-    <div style="margin: 40px 0; border: 2px solid #667eea; padding: 20px; background: #f8f9ff;">
-      <h2 style="color: #333; margin-top: 0;">CELKOVÝ SOUHRN</h2>
-      <table style="width: 100%;">
-        <tr>
-          <td style="padding: 8px; font-weight: bold;">Tepelné čerpadlo včetně rozvaděče/hydromodulu</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(
-            heatPumpTotal
-          ).toLocaleString("cs-CZ")} Kč</td>
-        </tr>
-        <tr>
-          <td style="padding: 8px; font-weight: bold;">Příslušenství</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(
-            accessoriesTotal
-          ).toLocaleString("cs-CZ")} Kč</td>
-        </tr>
-        <tr>
-          <td style="padding: 8px; font-weight: bold;">Práce a instalační materiál</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(
-            workTotal
-          ).toLocaleString("cs-CZ")} Kč</td>
-        </tr>
-        <tr style="border-top: 2px solid #333;">
-          <td style="padding: 8px; font-weight: bold;">Mezisoučet</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(
-            subtotal
-          ).toLocaleString("cs-CZ")} Kč</td>
-        </tr>
-        <tr>
-          <td style="padding: 8px;">DPH ${(vat * 100).toFixed(0)}%</td>
-          <td style="padding: 8px; text-align: right;">${Math.round(
-            vatAmount
-          ).toLocaleString("cs-CZ")} Kč</td>
-        </tr>
-        <tr style="background: #667eea; color: white;">
-          <td style="padding: 12px; font-weight: bold; font-size: 1.2em;">CELKEM K ÚHRADĚ</td>
-          <td style="padding: 12px; text-align: right; font-weight: bold; font-size: 1.2em;">${Math.round(
-            total
-          ).toLocaleString("cs-CZ")} Kč</td>
-        </tr>
-      </table>
-    </div>
+    const totals = calculateTotals(selectedItems, selectedWork, customerType);
     
-    <div style="margin-top: 30px; padding: 20px; background: #f5f5f5;">
-      <p><strong>Platební podmínky:</strong> 50% záloha při objednávce, doplatek při dodání</p>
-      <p><strong>Dodací lhůta:</strong> 2-4 týdny od objednávky</p>
-      <p><strong>Kontakt:</strong> info@hotjet.cz | +420 xxx xxx xxx</p>
-    </div>
-  </div>`;
+    let emailHtml = `CENOVÁ NABÍDKA - ${projectName}
+    
+Zákazník: ${customerName}
+Datum: ${new Date(offerDate).toLocaleDateString("cs-CZ")}
 
-    // Funkce pro kopírování HTML do schránky
-    const copyHtmlToClipboard = async (html) => {
-      try {
-        // Moderní způsob - Clipboard API s HTML
-        if (navigator.clipboard && window.ClipboardItem) {
-          const blob = new Blob([html], { type: "text/html" });
-          const clipboardItem = new window.ClipboardItem({ "text/html": blob });
-          await navigator.clipboard.write([clipboardItem]);
-          return true;
-        }
-      } catch (err) {
-        console.log(
-          "Moderní clipboard API selhalo, zkouším alternativu...",
-          err
-        );
-      }
+CELKEM K ÚHRADĚ: ${Math.round(totals.total).toLocaleString("cs-CZ")} Kč`;
 
-      // Alternativa - vytvoření dočasného elementu
-      try {
-        const tempDiv = document.createElement("div");
-        tempDiv.style.position = "fixed";
-        tempDiv.style.pointerEvents = "none";
-        tempDiv.style.opacity = "0";
-        tempDiv.innerHTML = html;
-        document.body.appendChild(tempDiv);
-
-        const range = document.createRange();
-        range.selectNodeContents(tempDiv);
-
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-        document.execCommand("copy");
-        selection.removeAllRanges();
-        document.body.removeChild(tempDiv);
-
-        return true;
-      } catch (err) {
-        console.error("Kopírování selhalo:", err);
-        return false;
-      }
-    };
-
-    // Zkopírovat do schránky
-    const success = await copyHtmlToClipboard(emailHtml);
-
-    if (success) {
-      alert(
-        `✅ Nabídka byla zkopírována do schránky!\n\n📧 Můžete ji nyní vložit přímo do emailu (Ctrl+V / Cmd+V).\n\n💡 Tip: Ve většině emailových klientů zachová formátování.`
-      );
-    } else {
-      // Pokud kopírování selhalo, otevři nové okno s HTML
-      const newWindow = window.open("", "_blank");
-      newWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Nabídka - ${projectName}</title>
-        <meta charset="UTF-8">
-      </head>
-      <body>
-        ${emailHtml}
-        <div style="position: fixed; top: 10px; right: 10px; background: #667eea; color: white; padding: 10px; border-radius: 5px;">
-          Označte vše (Ctrl+A) a zkopírujte (Ctrl+C)
-        </div>
-      </body>
-      </html>
-    `);
-      newWindow.document.close();
-
-      alert(
-        "📋 Nabídka byla otevřena v novém okně.\n\nPoužijte Ctrl+A pro označení všeho a Ctrl+C pro zkopírování."
-      );
+    try {
+      await navigator.clipboard.writeText(emailHtml);
+      alert("✅ Nabídka zkopírována!");
+    } catch (error) {
+      alert("❌ Chyba: " + error.message);
     }
-
-    // Dodatečně nabídnout stažení jako HTML soubor
-    const fullHtml = `<!DOCTYPE html>
-<html lang="cs">
-<head>
-  <meta charset="UTF-8">
-  <title>Nabídka - ${projectName}</title>
-</head>
-<body>
-  ${emailHtml}
-</body>
-</html>`;
-
-    const blob = new Blob([fullHtml], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `nabidka-${projectName || customerName || "hotjet"}-${
-      new Date().toISOString().split("T")[0]
-    }.html`;
-
-    // Přidat tlačítko pro stažení do UI místo automatického stažení
-    setTimeout(() => {
-      if (confirm("💾 Chcete také stáhnout nabídku jako HTML soubor?")) {
-        a.click();
-      }
-      URL.revokeObjectURL(url);
-    }, 1000);
   };
 
-  // Toggle výběr položky
+  // Funkce pro správu položek
   const toggleItem = (category, code) => {
     const key = `${category}-${code}`;
     const product = priceList[category].items.find((p) => p.code === code);
 
     setSelectedItems((prev) => {
       if (prev[key] && prev[key].quantity > 0) {
-        // Odškrtnout - smazat úplně z objektu
         const newItems = { ...prev };
         delete newItems[key];
         return newItems;
       } else {
-        // Zaškrtnout - přidat s kompletními informacemi
-        return {
-          ...prev,
-          [key]: {
-            ...product,
-            quantity: 1,
-          },
-        };
+        return { ...prev, [key]: { ...product, quantity: 1 } };
       }
     });
   };
 
-  // Smazání konkrétní položky ze seznamu
   const removeItem = (key) => {
     setSelectedItems((prev) => {
       const newItems = { ...prev };
@@ -861,7 +78,6 @@ function App() {
     });
   };
 
-  // Smazání konkrétní práce ze seznamu
   const removeWork = (key) => {
     setSelectedWork((prev) => {
       const newItems = { ...prev };
@@ -870,7 +86,6 @@ function App() {
     });
   };
 
-  // Změna množství
   const updateQuantity = (category, code, quantity) => {
     const key = `${category}-${code}`;
     const product = priceList[category].items.find((p) => p.code === code);
@@ -878,252 +93,80 @@ function App() {
 
     setSelectedItems((prev) => {
       if (newQuantity === 0) {
-        // Pokud je množství 0, smazat z objektu
         const newItems = { ...prev };
         delete newItems[key];
         return newItems;
       } else {
-        // Jinak aktualizovat s kompletními informacemi
-        return {
-          ...prev,
-          [key]: {
-            ...product,
-            quantity: newQuantity,
-          },
-        };
+        return { ...prev, [key]: { ...product, quantity: newQuantity } };
       }
     });
   };
 
-  // Toggle výběr práce
   const toggleWork = (index) => {
-    const workList =
-      heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
+    const workList = heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
     const work = workList[index];
     const key = `work-${index}`;
 
     setSelectedWork((prev) => {
       if (prev[key] && prev[key].quantity > 0) {
-        // Odškrtnout - smazat úplně z objektu
-        const newWork = { ...prev };
-        delete newWork[key];
-        return newWork;
+        const newItems = { ...prev };
+        delete newItems[key];
+        return newItems;
       } else {
-        // Zaškrtnout - přidat s kompletními informacemi
-        return {
-          ...prev,
-          [key]: { name: work.name, price: work.price, quantity: 1 },
-        };
+        return { ...prev, [key]: { name: work.name, price: work.price, quantity: 1 } };
       }
     });
   };
 
-  // Změna množství práce
   const updateWorkQuantity = (index, quantity) => {
-    const workList =
-      heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
+    const workList = heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
     const work = workList[index];
     const key = `work-${index}`;
     const newQuantity = parseInt(quantity) || 0;
 
     setSelectedWork((prev) => {
+      const currentPrice = prev[key]?.price || work.price;
+      
       if (newQuantity === 0) {
-        // Pokud je množství 0, smazat z objektu
-        const newWork = { ...prev };
-        delete newWork[key];
-        return newWork;
+        const newItems = { ...prev };
+        delete newItems[key];
+        return newItems;
       } else {
-        // Jinak aktualizovat s kompletními informacemi, zachovat editovanou cenu
-        const currentPrice = prev[key]?.price || work.price;
-        return {
-          ...prev,
-          [key]: {
-            name: work.name,
-            price: currentPrice,
-            quantity: newQuantity,
-          },
-        };
+        return { ...prev, [key]: { name: work.name, price: currentPrice, quantity: newQuantity } };
       }
     });
   };
 
-  // Aktualizace ceny práce
   const updateWorkPrice = (index, newPrice) => {
-    const workList =
-      heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
-    const work = workList[index];
     const key = `work-${index}`;
-
     setSelectedWork((prev) => {
       if (prev[key]) {
-        return {
-          ...prev,
-          [key]: { ...prev[key], price: newPrice },
-        };
+        return { ...prev, [key]: { ...prev[key], price: newPrice } };
       }
       return prev;
     });
   };
 
-  // Uložení nabídky do souboru
   const saveQuote = () => {
-    const quoteData = {
-      projectName,
-      customerName,
-      customerType,
-      offerDate,
-      selectedItems,
-      selectedWork,
-      heatPumpType,
-      createdAt: new Date().toISOString(),
-      version: "1.1",
-    };
-
-    const blob = new Blob([JSON.stringify(quoteData, null, 2)], {
-      type: "application/json",
+    const quoteData = createQuoteData({
+      projectName, customerName, customerType, offerDate,
+      selectedItems, selectedWork, heatPumpType,
     });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `hotjet-nabidka-${projectName || customerName || "nova"}-${
-      new Date().toISOString().split("T")[0]
-    }.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    saveQuoteToFile(quoteData, projectName, customerName);
   };
 
-  // Načtení nabídky ze souboru
   const loadQuote = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const quoteData = JSON.parse(e.target.result);
-
-          // Načtení všech dat z uložené nabídky
-          if (quoteData.projectName !== undefined)
-            setProjectName(quoteData.projectName);
-          if (quoteData.customerName !== undefined)
-            setCustomerName(quoteData.customerName);
-          if (quoteData.customerType !== undefined)
-            setCustomerType(quoteData.customerType);
-          if (quoteData.offerDate !== undefined)
-            setOfferDate(quoteData.offerDate);
-          if (quoteData.selectedItems !== undefined)
-            setSelectedItems(quoteData.selectedItems);
-          if (quoteData.selectedWork !== undefined)
-            setSelectedWork(quoteData.selectedWork);
-          if (quoteData.heatPumpType !== undefined)
-            setHeatPumpType(quoteData.heatPumpType);
-
-          alert("Nabídka byla úspěšně načtena!");
-        } catch (error) {
-          alert("Chyba při načítání nabídky: " + error.message);
-        }
-      };
-      reader.readAsText(file);
-    }
-    // Reset input pro možnost načtení stejného souboru znovu
+    loadQuoteFromFile(file, (quoteData) => {
+      if (quoteData.projectName !== undefined) setProjectName(quoteData.projectName);
+      if (quoteData.customerName !== undefined) setCustomerName(quoteData.customerName);
+      if (quoteData.customerType !== undefined) setCustomerType(quoteData.customerType);
+      if (quoteData.offerDate !== undefined) setOfferDate(quoteData.offerDate);
+      if (quoteData.selectedItems !== undefined) setSelectedItems(quoteData.selectedItems);
+      if (quoteData.selectedWork !== undefined) setSelectedWork(quoteData.selectedWork);
+      if (quoteData.heatPumpType !== undefined) setHeatPumpType(quoteData.heatPumpType);
+    });
     event.target.value = "";
-  };
-
-  // Nová struktura kategorií podle typu TČ
-  const getCategoryStructure = () => {
-    if (heatPumpType === "vzduch") {
-      return {
-        heatPumps: {
-          name: "Tepelná čerpadla vzduch-voda",
-          subcategories: {
-            basic: { name: "Základní série", categories: ["A", "B", "D", "E"] },
-            highTemp: { name: "Vysokoteplotní", categories: ["H"] },
-          },
-        },
-        controllers: {
-          name: "Rozvaděče a hydromoduly",
-          subcategories: {
-            basic: { name: "Pro základní série", categories: ["C1", "C2"] },
-            highTemp: { name: "Pro vysokoteplotní", categories: ["J"] },
-          },
-        },
-        accessories: {
-          name: "Příslušenství",
-          subcategories: {
-            all: {
-              name: "Vše",
-              categories: ["M", "N", "O", "P", "Q", "R", "S", "T", "Z"],
-            },
-          },
-        },
-      };
-    } else {
-      return {
-        heatPumps: {
-          name: "Tepelná čerpadla země/voda-voda",
-          subcategories: {
-            water: { name: "Voda-voda", categories: ["F"] },
-            ground: { name: "Země-voda", categories: ["G"] },
-          },
-        },
-        accessories: {
-          name: "Příslušenství",
-          subcategories: {
-            all: {
-              name: "Vše",
-              categories: ["M", "N", "O", "P", "Q", "R", "S", "T", "Z"],
-            },
-          },
-        },
-      };
-    }
-  };
-
-  // Získání kategorií pro aktuální výběr
-  const getDisplayCategories = () => {
-    const structure = getCategoryStructure();
-
-    if (!selectedCategory) {
-      return [];
-    }
-
-    if (!selectedSubcategory) {
-      return [];
-    }
-
-    const category = structure[selectedCategory];
-    if (!category) return [];
-
-    const subcategory = category.subcategories[selectedSubcategory];
-    if (!subcategory) return [];
-
-    return subcategory.categories;
-  };
-
-  // Legacy funkce pro zpětnou kompatibilitu (používá se v HTML generování)
-  const getFilteredCategories = () => {
-    if (heatPumpType === "vzduch") {
-      return [
-        "A",
-        "B",
-        "C1",
-        "C2",
-        "D",
-        "E",
-        "H",
-        "J",
-        "M",
-        "N",
-        "O",
-        "P",
-        "Q",
-        "R",
-        "S",
-        "T",
-        "Z",
-      ];
-    } else {
-      return ["F", "G", "M", "N", "O", "P", "Q", "R", "S", "T", "Z"];
-    }
   };
 
   return (
@@ -1132,11 +175,10 @@ function App() {
       <div className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-              <Package className="text-blue-600" />
+            <h1 className="text-3xl font-bold text-gray-900">
               HOTJET - Generátor nabídek
             </h1>
-            <div className="flex gap-2">
+            <div className="flex space-x-4">
               <button
                 onClick={() => setActiveTab("generator")}
                 className={`px-4 py-2 rounded-lg font-medium transition-all ${
@@ -1156,7 +198,7 @@ function App() {
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
-                <Settings className="inline mr-2" size={16} />
+                <Edit className="inline mr-2" size={16} />
                 Editor dat
               </button>
             </div>
@@ -1168,660 +210,66 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {activeTab === "generator" ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Levý panel - Základní údaje a výběr položek */}
             <div className="space-y-6">
-              {/* Kompaktní základní údaje */}
-              <div className="bg-white rounded-xl shadow-md p-4">
-                <h2 className="text-lg font-semibold mb-3 text-gray-800 border-b pb-2">
-                  Základní údaje
-                </h2>
-                <div className="space-y-3">
-                  {/* První řádek - Název akce napříč */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Název akce
-                    </label>
-                    <input
-                      type="text"
-                      value={projectName}
-                      onChange={(e) => setProjectName(e.target.value)}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="např. Rodinný dům Novákovi"
-                    />
-                  </div>
+              <BasicInfoForm
+                projectName={projectName}
+                setProjectName={setProjectName}
+                customerName={customerName}
+                setCustomerName={setCustomerName}
+                offerDate={offerDate}
+                setOfferDate={setOfferDate}
+                customerType={customerType}
+                setCustomerType={setCustomerType}
+                heatPumpType={heatPumpType}
+                setHeatPumpType={setHeatPumpType}
+                setSelectedCategory={setSelectedCategory}
+                setSelectedSubcategory={setSelectedSubcategory}
+              />
 
-                  {/* Druhý řádek - Zákazník a datum v jednom řádku */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Zákazník
-                      </label>
-                      <input
-                        type="text"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="např. Jan Novák"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Datum
-                      </label>
-                      <input
-                        type="date"
-                        value={offerDate}
-                        onChange={(e) => setOfferDate(e.target.value)}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Třetí řádek - Typ zákazníka */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Typ zákazníka
-                    </label>
-                    <div className="grid grid-cols-3 gap-1">
-                      <button
-                        onClick={() => setCustomerType("koncovy")}
-                        className={`py-1.5 px-2 rounded text-xs border transition-all ${
-                          customerType === "koncovy"
-                            ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : "border-gray-300 hover:border-gray-400"
-                        }`}
-                      >
-                        Koncový
-                        <div className="text-xs mt-0.5">10%</div>
-                      </button>
-                      <button
-                        onClick={() => setCustomerType("montazni")}
-                        className={`py-1.5 px-2 rounded text-xs border transition-all ${
-                          customerType === "montazni"
-                            ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : "border-gray-300 hover:border-gray-400"
-                        }`}
-                      >
-                        Montážní
-                        <div className="text-xs mt-0.5">37%</div>
-                      </button>
-                      <button
-                        onClick={() => setCustomerType("montazniPlus")}
-                        className={`py-1.5 px-2 rounded text-xs border transition-all ${
-                          customerType === "montazniPlus"
-                            ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : "border-gray-300 hover:border-gray-400"
-                        }`}
-                      >
-                        Montážní+
-                        <div className="text-xs mt-0.5">42%</div>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Čtvrtý řádek - Typ TČ */}
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Typ tepelného čerpadla
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => {
-                          setHeatPumpType("vzduch");
-                          setSelectedCategory(null);
-                          setSelectedSubcategory(null);
-                        }}
-                        className={`py-1.5 px-2 rounded text-sm border transition-all ${
-                          heatPumpType === "vzduch"
-                            ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : "border-gray-300 hover:border-gray-400"
-                        }`}
-                      >
-                        Vzduch-voda
-                      </button>
-                      <button
-                        onClick={() => {
-                          setHeatPumpType("zeme");
-                          setSelectedCategory(null);
-                          setSelectedSubcategory(null);
-                        }}
-                        className={`py-1.5 px-2 rounded text-sm border transition-all ${
-                          heatPumpType === "zeme"
-                            ? "border-blue-500 bg-blue-50 text-blue-700"
-                            : "border-gray-300 hover:border-gray-400"
-                        }`}
-                      >
-                        Země/Voda-voda
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Nová stromová navigace */}
-              <div className="bg-white rounded-xl shadow-md p-6 max-h-screen overflow-y-auto">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-                  Výběr položek -{" "}
-                  {heatPumpType === "vzduch" ? "Vzduch-voda" : "Země/Voda-voda"}
-                </h2>
-
-                {/* Rychlý přehled vybraných položek */}
-                {Object.keys(selectedItems).length > 0 && (
-                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <h4 className="text-sm font-medium text-green-800 mb-2">
-                      ✓ Vybrané položky (
-                      {
-                        Object.values(selectedItems).filter(
-                          (item) => item.quantity > 0
-                        ).length
-                      }
-                      ):
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(selectedItems)
-                        .filter(([key, item]) => item.quantity > 0)
-                        .slice(0, 6)
-                        .map(([key, item]) => (
-                          <span
-                            key={key}
-                            className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded"
-                          >
-                            {item.code} ({item.quantity}x)
-                          </span>
-                        ))}
-                      {Object.values(selectedItems).filter(
-                        (item) => item.quantity > 0
-                      ).length > 6 && (
-                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
-                          +
-                          {Object.values(selectedItems).filter(
-                            (item) => item.quantity > 0
-                          ).length - 6}{" "}
-                          dalších...
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Navigační kroky */}
-                <div className="mb-6">
-                  {/* Krok 1: Výběr hlavní kategorie */}
-                  {!selectedCategory && (
-                    <div className="space-y-3">
-                      <h3 className="font-medium text-gray-700">
-                        1. Vyberte kategorii:
-                      </h3>
-                      <div className="grid gap-3">
-                        {Object.entries(getCategoryStructure()).map(
-                          ([categoryKey, categoryData]) => (
-                            <button
-                              key={categoryKey}
-                              onClick={() => setSelectedCategory(categoryKey)}
-                              className="text-left p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all"
-                            >
-                              <div className="font-medium text-gray-800">
-                                {categoryData.name}
-                              </div>
-                              <div className="text-sm text-gray-500 mt-1">
-                                {Object.keys(categoryData.subcategories).length}{" "}
-                                skupin dostupných
-                              </div>
-                            </button>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Krok 2: Výběr podkategorie */}
-                  {selectedCategory && !selectedSubcategory && (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 mb-3">
-                        <button
-                          onClick={() => setSelectedCategory(null)}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          ← Zpět
-                        </button>
-                        <h3 className="font-medium text-gray-700">
-                          2. Vyberte skupinu v kategorii "
-                          {getCategoryStructure()[selectedCategory]?.name}":
-                        </h3>
-                      </div>
-                      <div className="grid gap-3">
-                        {Object.entries(
-                          getCategoryStructure()[selectedCategory]
-                            ?.subcategories || {}
-                        ).map(([subKey, subData]) => (
-                          <button
-                            key={subKey}
-                            onClick={() => setSelectedSubcategory(subKey)}
-                            className="text-left p-3 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all"
-                          >
-                            <div className="font-medium text-gray-800">
-                              {subData.name}
-                            </div>
-                            <div className="text-sm text-gray-500 mt-1">
-                              {subData.categories.length} kategorií dostupných
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Krok 3: Zobrazení produktů */}
-                  {selectedCategory && selectedSubcategory && (
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-4">
-                        <button
-                          onClick={() => setSelectedSubcategory(null)}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
-                        >
-                          ← Zpět
-                        </button>
-                        <h3 className="font-medium text-gray-700">
-                          3. Produkty v skupině "
-                          {
-                            getCategoryStructure()[selectedCategory]
-                              ?.subcategories[selectedSubcategory]?.name
-                          }
-                          ":
-                        </h3>
-                      </div>
-
-                      <div className="space-y-6">
-                        {getDisplayCategories().map((category) => (
-                          <div key={category} className="border-b pb-4">
-                            <h4 className="font-semibold text-gray-700 mb-3 bg-gray-50 p-2 rounded">
-                              {category}. {priceList[category]?.name}
-                            </h4>
-
-                            {/* Popis kategorie */}
-                            {priceList[category]?.description && (
-                              <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-200 rounded-r">
-                                <div className="text-sm text-gray-700 whitespace-pre-line">
-                                  {priceList[category].description
-                                    .split("\n")
-                                    .map((line, index) => (
-                                      <div key={index} className="mb-1">
-                                        {line}
-                                      </div>
-                                    ))}
-                                </div>
-                              </div>
-                            )}
-
-                            <div className="space-y-2">
-                              {priceList[category]?.items.map((item) => {
-                                const key = `${category}-${item.code}`;
-                                const isSelected =
-                                  selectedItems[key]?.quantity > 0;
-                                return (
-                                  <div
-                                    key={item.code}
-                                    className="flex items-center gap-3 pl-4"
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={isSelected}
-                                      onChange={() =>
-                                        toggleItem(category, item.code)
-                                      }
-                                      className="w-4 h-4 text-blue-600"
-                                    />
-                                    <div className="flex-1">
-                                      <div className="text-sm">{item.name}</div>
-                                      <div className="text-xs text-gray-500">
-                                        {item.code} -{" "}
-                                        {Math.round(item.price).toLocaleString(
-                                          "cs-CZ"
-                                        )}{" "}
-                                        Kč
-                                      </div>
-                                    </div>
-                                    {isSelected && (
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        value={
-                                          selectedItems[key]?.quantity || 0
-                                        }
-                                        onChange={(e) =>
-                                          updateQuantity(
-                                            category,
-                                            item.code,
-                                            e.target.value
-                                          )
-                                        }
-                                        className="w-16 px-2 py-1 border rounded"
-                                      />
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <CategoryNavigation
+                heatPumpType={heatPumpType}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                selectedSubcategory={selectedSubcategory}
+                setSelectedSubcategory={setSelectedSubcategory}
+                selectedItems={selectedItems}
+                priceList={priceList}
+                toggleItem={toggleItem}
+                updateQuantity={updateQuantity}
+              />
             </div>
 
-            {/* Pravý panel - Práce a generování */}
             <div className="space-y-6">
-              {/* Práce a instalační materiál */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-                  Práce a instalační materiál
-                </h2>
-                <div className="space-y-2">
-                  {(heatPumpType === "zeme"
-                    ? workPrices.zemeVoda
-                    : workPrices.vzduchVoda
-                  ).map((work, index) => {
-                    const key = `work-${index}`;
-                    const isSelected = selectedWork[key]?.quantity > 0;
-                    return (
-                      <div key={index} className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleWork(index)}
-                          className="w-4 h-4 text-blue-600"
-                        />
-                        <div className="flex-1">
-                          <div className="text-sm">{work.name}</div>
-                          <div className="text-xs text-gray-500 flex items-center gap-2">
-                            {isSelected ? (
-                              <>
-                                <span>Cena:</span>
-                                <input
-                                  type="number"
-                                  min="0"
-                                  value={selectedWork[key]?.price || work.price}
-                                  onChange={(e) =>
-                                    updateWorkPrice(
-                                      index,
-                                      parseInt(e.target.value) || 0
-                                    )
-                                  }
-                                  className="w-20 px-1 py-0.5 border rounded text-xs"
-                                />
-                                <span>Kč</span>
-                              </>
-                            ) : (
-                              <span>
-                                {Math.round(work.price).toLocaleString("cs-CZ")}{" "}
-                                Kč
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        {isSelected && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs">Ks:</span>
-                            <input
-                              type="number"
-                              min="0"
-                              value={selectedWork[key]?.quantity || 0}
-                              onChange={(e) =>
-                                updateWorkQuantity(index, e.target.value)
-                              }
-                              className="w-16 px-2 py-1 border rounded"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              <WorkSelection
+                heatPumpType={heatPumpType}
+                workPrices={workPrices}
+                selectedWork={selectedWork}
+                toggleWork={toggleWork}
+                updateWorkQuantity={updateWorkQuantity}
+                updateWorkPrice={updateWorkPrice}
+              />
 
-              {/* Akce */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-                  Akce
-                </h2>
+              <ActionPanel
+                generateOffer={generateOffer}
+                saveQuote={saveQuote}
+                loadQuote={loadQuote}
+              />
 
-                <div className="space-y-3">
-                  {/* Generování RTF nabídky */}
-                  <button
-                    onClick={generateOffer}
-                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center justify-center gap-2"
-                  >
-                    <FileText size={20} />
-                    Vygenerovat profesionální RTF nabídku
-                  </button>
-
-                  {/* Save/Load nabídky */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={saveQuote}
-                      className="py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all flex items-center justify-center gap-2"
-                    >
-                      <Save size={16} />
-                      Uložit nabídku
-                    </button>
-
-                    <label className="py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all flex items-center justify-center gap-2 cursor-pointer">
-                      <Upload size={16} />
-                      Načíst nabídku
-                      <input
-                        type="file"
-                        accept=".json"
-                        onChange={loadQuote}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Náhled vybraných položek */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-                  Přehled vybraných položek
-                </h2>
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {Object.entries(selectedItems)
-                    .filter(([key, val]) => val.quantity > 0)
-                    .map(([key, item]) => {
-                      const discount = getDiscount();
-                      const priceAfterDiscount = item.price * (1 - discount);
-                      return (
-                        <div
-                          key={key}
-                          className="flex items-center justify-between text-sm py-2 border-b hover:bg-gray-50"
-                        >
-                          <div className="flex-1">
-                            <div className="font-medium">{item.name}</div>
-                            <div className="text-xs text-gray-500">
-                              {item.code}
-                            </div>
-                          </div>
-                          <div className="text-right mr-2">
-                            <div>
-                              {item.quantity}x{" "}
-                              {Math.round(priceAfterDiscount).toLocaleString(
-                                "cs-CZ"
-                              )}{" "}
-                              Kč
-                            </div>
-                            <div className="font-semibold">
-                              {Math.round(
-                                priceAfterDiscount * item.quantity
-                              ).toLocaleString("cs-CZ")}{" "}
-                              Kč
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => removeItem(key)}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
-                            title="Smazat položku"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      );
-                    })}
-                  {Object.entries(selectedWork)
-                    .filter(([key, val]) => val.quantity > 0)
-                    .map(([key, item]) => (
-                      <div
-                        key={key}
-                        className="flex items-center justify-between text-sm py-2 border-b hover:bg-gray-50"
-                      >
-                        <div className="flex-1">
-                          <div className="font-medium">{item.name}</div>
-                          <div className="text-xs text-gray-500">Práce</div>
-                        </div>
-                        <div className="text-right mr-2">
-                          <div>
-                            {item.quantity}x{" "}
-                            {Math.round(item.price).toLocaleString("cs-CZ")} Kč
-                          </div>
-                          <div className="font-semibold">
-                            {Math.round(
-                              item.price * item.quantity
-                            ).toLocaleString("cs-CZ")}{" "}
-                            Kč
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => removeWork(key)}
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors"
-                          title="Smazat práci"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                </div>
-
-                {/* Součet bez DPH */}
-                {(Object.keys(selectedItems).length > 0 ||
-                  Object.keys(selectedWork).length > 0) && (
-                  <div className="mt-4 pt-4 border-t">
-                    <div className="text-right space-y-1">
-                      <div className="text-sm text-gray-600">
-                        Celkem bez DPH:{" "}
-                        <span className="font-semibold">
-                          {Math.round(
-                            Object.entries(selectedItems)
-                              .filter(([key, val]) => val.quantity > 0)
-                              .reduce((sum, [key, item]) => {
-                                const discount = getDiscount();
-                                const priceAfterDiscount =
-                                  item.price * (1 - discount);
-                                return sum + priceAfterDiscount * item.quantity;
-                              }, 0) +
-                              Object.entries(selectedWork)
-                                .filter(([key, val]) => val.quantity > 0)
-                                .reduce(
-                                  (sum, [key, item]) =>
-                                    sum + item.price * item.quantity,
-                                  0
-                                )
-                          ).toLocaleString("cs-CZ")}{" "}
-                          Kč
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        DPH {customerType === "koncovy" ? "12%" : "21%"} se
-                        přidá při generování nabídky
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <SelectedItemsList
+                selectedItems={selectedItems}
+                selectedWork={selectedWork}
+                customerType={customerType}
+                removeItem={removeItem}
+                removeWork={removeWork}
+              />
             </div>
           </div>
         ) : (
-          /* Editor dat */
           <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Editor dat a ceníku
-              </h2>
-              <div className="flex gap-3">
-                <label className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer flex items-center gap-2">
-                  <Upload size={20} />
-                  Import JSON
-                  <input
-                    type="file"
-                    accept=".json"
-                    onChange={importData}
-                    className="hidden"
-                  />
-                </label>
-                <button
-                  onClick={exportData}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                >
-                  <Download size={20} />
-                  Export JSON
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-              <div className="flex">
-                <div className="ml-3">
-                  <p className="text-sm text-yellow-700">
-                    <strong>Tip:</strong> Exportuj si aktuální data do JSON
-                    souboru, můžeš je editovat v textovém editoru a pak znovu
-                    nahrát. Pro Vercel deployment můžeš data hostovat na GitHub
-                    nebo jiném CDN a načítat je přes API.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-700">
-                Struktura dat
-              </h3>
-              <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto text-xs">
-                {`{
-  "priceList": {
-    "A": {
-      "name": "Název kategorie",
-      "description": "Popis kategorie",
-      "items": [
-        {
-          "code": "KÓD",
-          "name": "Název položky",
-          "price": 12345
-        }
-      ]
-    }
-  },
-  "workPrices": {
-    "zemeVoda": [...],
-    "vzduchVoda": [...]
-  }
-}`}
-              </pre>
-
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                  Integrace s backendem
-                </h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-2">
-                    Pro napojení na API nebo databázi můžeš použít tento
-                    endpoint:
-                  </p>
-                  <code className="block bg-white p-2 rounded border text-sm">
-                    {`fetch('/api/pricelist').then(res => res.json())`}
-                  </code>
-                </div>
-              </div>
-            </div>
+            <h3 className="text-lg font-semibold text-gray-700">Editor dat</h3>
+            <p className="text-sm text-gray-600 mt-2">
+              Data jsou nyní v samostatných modulech v /data/ složce.
+            </p>
           </div>
         )}
       </div>
