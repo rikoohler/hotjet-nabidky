@@ -20,7 +20,7 @@ const defaultPriceList = {
   A: {
     name: "Vzduch-voda, venkovní monoblok, R454b",
     description:
-      "Smart Grid Ready a podpora fotovoltaiky\nHybridizace - funkce v regulaci\nSystém aktivního potlačení hluku\nScroll kompresor Copeland\nBezpečné chladivo R454B",
+      "⚡ Smart Grid Ready a podpora fotovoltaiky\n🔄 Hybridizace - funkce v regulaci\n🔇 Systém aktivního potlačení hluku\n🔧 Scroll kompresor Copeland\n🌿 Bezpečné chladivo R454B",
     items: [
       {
         code: "HJZETXE07",
@@ -41,7 +41,7 @@ const defaultPriceList = {
   },
   B: {
     name: "Vzduch-voda, venkovní monoblok, R290 (propan)",
-    description: "Ekologické chladivo R290\nVysoká účinnost\nNízká hlučnost",
+    description: "🌱 Ekologické chladivo R290\n⚡ Vysoká účinnost\n🔇 Nízká hlučnost",
     items: [
       {
         code: "HJZETXP07",
@@ -68,7 +68,7 @@ const defaultPriceList = {
   C1: {
     name: "ROZVADĚČ",
     description:
-      "Inteligentní regulátor Siemens\nCelokovový externí rozvaděč\nVenkovní čidlo\nÚsporné oběhové čerpadlo\nWebserver pro ovládání",
+      "🧠 Inteligentní regulátor Siemens\n🏠 Celokovový externí rozvaděč\n🌡️ Venkovní čidlo\n💧 Úsporné oběhové čerpadlo\n🌐 Webserver pro ovládání",
     items: [
       {
         code: "RZ107",
@@ -85,7 +85,7 @@ const defaultPriceList = {
   C2: {
     name: "HYDROMODUL",
     description:
-      "Kompletní rozvaděč s regulátorem\nInterní elektrokotel 7,5kW\n3-cestný ventil\nÚsporné čerpadlo\nWebserver a aplikace",
+      "🔧 Kompletní rozvaděč s regulátorem\n⚡ Interní elektrokotel 7,5kW\n🔄 3-cestný ventil\n💧 Úsporné čerpadlo\n📱 Webserver a aplikace",
     items: [
       {
         code: "HMD07",
@@ -239,7 +239,7 @@ const defaultPriceList = {
   N: {
     name: "Průtokový ohřev TV",
     description:
-      "🔵 Dokonalá hygiena a čistota\n⚡ Maximální výkon a efektivita\n🛠️ Praktické benefity",
+      "🔵 Dokonalá hygiena a čistota\n• Vždy čerstvá teplá voda ohřívaná v moderní výměníkové stanici\n• Žádné usazeniny či bakterie - voda se neukládá v bojleru\n• Bez nutnosti pravidelné dezinfekce proti legionelle\n• Prémiové materiály: nerezový výměník a měděné rozvody\n\n⚡ Maximální výkon a efektivita\n• Plný výkon tepelného čerpadla bez omezení výměníkem\n• Neomezená kapacita díky možnosti rozšíření o další nádrže\n• Profesionální řešení inspirované systémy z bytových domů\n\n🛠️ Praktické benefity\n• Snadná údržba - všechny komponenty přístupné zvenčí\n• Nadstandardní životnost ve srovnání s klasickými bojlery\n• Flexibilní instalace s možností budoucího rozšíření",
     items: [
       {
         code: "FW300+",
@@ -538,12 +538,6 @@ function App() {
       if (items.length > 0) {
         html += `<div class="section"><h2>${priceList[cat].name}</h2>`;
 
-        if (priceList[cat].description) {
-          html += `<div class="description">${priceList[
-            cat
-          ].description.replace(/\n/g, "<br>")}</div>`;
-        }
-
         html += `<table>
           <tr>
             <th>Kód</th>
@@ -564,15 +558,23 @@ function App() {
           <tr>
             <td>${item.code}</td>
             <td>${item.name}</td>
-            <td>${item.price.toLocaleString("cs-CZ")} Kč</td>
-            <td>${(item.price * discount).toLocaleString("cs-CZ")} Kč</td>
-            <td>${priceAfterDiscount.toLocaleString("cs-CZ")} Kč</td>
-            <td>${item.quantity}</td>
-            <td><strong>${total.toLocaleString("cs-CZ")} Kč</strong></td>
+            <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
+            <td align="right">${(item.price * discount).toLocaleString("cs-CZ")}</td>
+            <td align="right">${priceAfterDiscount.toLocaleString("cs-CZ")}</td>
+            <td align="center">${item.quantity}</td>
+            <td align="right"><strong>${total.toLocaleString("cs-CZ")}</strong></td>
           </tr>`;
         });
 
-        html += `</table></div>`;
+        html += `</table>`;
+
+        if (priceList[cat].description) {
+          html += `<div class="description">${priceList[
+            cat
+          ].description.replace(/\n/g, "<br>")}</div>`;
+        }
+
+        html += `</div>`;
       }
     });
 
@@ -585,12 +587,6 @@ function App() {
       if (items.length > 0) {
         html += `<div class="section"><h2>${priceList[cat].name}</h2>`;
 
-        if (priceList[cat].description) {
-          html += `<div class="description">${priceList[
-            cat
-          ].description.replace(/\n/g, "<br>")}</div>`;
-        }
-
         html += `<table>
           <tr>
             <th>Kód</th>
@@ -611,15 +607,23 @@ function App() {
           <tr>
             <td>${item.code}</td>
             <td>${item.name}</td>
-            <td>${item.price.toLocaleString("cs-CZ")} Kč</td>
-            <td>${(item.price * discount).toLocaleString("cs-CZ")} Kč</td>
-            <td>${priceAfterDiscount.toLocaleString("cs-CZ")} Kč</td>
-            <td>${item.quantity}</td>
-            <td><strong>${total.toLocaleString("cs-CZ")} Kč</strong></td>
+            <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
+            <td align="right">${(item.price * discount).toLocaleString("cs-CZ")}</td>
+            <td align="right">${priceAfterDiscount.toLocaleString("cs-CZ")}</td>
+            <td align="center">${item.quantity}</td>
+            <td align="right"><strong>${total.toLocaleString("cs-CZ")}</strong></td>
           </tr>`;
         });
 
-        html += `</table></div>`;
+        html += `</table>`;
+
+        if (priceList[cat].description) {
+          html += `<div class="description">${priceList[
+            cat
+          ].description.replace(/\n/g, "<br>")}</div>`;
+        }
+
+        html += `</div>`;
       }
     });
 
@@ -636,12 +640,6 @@ function App() {
 
       if (items.length > 0) {
         html += `<div class="section"><h2>${priceList[cat].name}</h2>`;
-
-        if (priceList[cat].description) {
-          html += `<div class="description">${priceList[
-            cat
-          ].description.replace(/\n/g, "<br>")}</div>`;
-        }
 
         html += `<table>
           <tr>
@@ -663,15 +661,23 @@ function App() {
           <tr>
             <td>${item.code}</td>
             <td>${item.name}</td>
-            <td>${item.price.toLocaleString("cs-CZ")} Kč</td>
-            <td>${(item.price * discount).toLocaleString("cs-CZ")} Kč</td>
-            <td>${priceAfterDiscount.toLocaleString("cs-CZ")} Kč</td>
-            <td>${item.quantity}</td>
-            <td><strong>${total.toLocaleString("cs-CZ")} Kč</strong></td>
+            <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
+            <td align="right">${(item.price * discount).toLocaleString("cs-CZ")}</td>
+            <td align="right">${priceAfterDiscount.toLocaleString("cs-CZ")}</td>
+            <td align="center">${item.quantity}</td>
+            <td align="right"><strong>${total.toLocaleString("cs-CZ")}</strong></td>
           </tr>`;
         });
 
-        html += `</table></div>`;
+        html += `</table>`;
+
+        if (priceList[cat].description) {
+          html += `<div class="description">${priceList[
+            cat
+          ].description.replace(/\n/g, "<br>")}</div>`;
+        }
+
+        html += `</div>`;
       }
     });
 
@@ -697,9 +703,9 @@ function App() {
         html += `
           <tr>
             <td>${item.name}</td>
-            <td>${item.price.toLocaleString("cs-CZ")} Kč</td>
-            <td>${item.quantity}</td>
-            <td><strong>${total.toLocaleString("cs-CZ")} Kč</strong></td>
+            <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
+            <td align="center">${item.quantity}</td>
+            <td align="right"><strong>${total.toLocaleString("cs-CZ")}</strong></td>
           </tr>`;
       });
 
@@ -754,9 +760,14 @@ function App() {
 </body>
 </html>`;
 
-    // Kopírování do schránky
-    navigator.clipboard.writeText(html).then(() => {
-      alert("HTML nabídka byla zkopírována do schránky!");
+    // Kopírování přímo použitelného HTML do schránky (ready pro email)
+    const emailReadyHtml = html.replace(
+      '<body>',
+      '<body style="font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; color: #333;">'
+    );
+    
+    navigator.clipboard.writeText(emailReadyHtml).then(() => {
+      alert("HTML nabídka připravená pro email byla zkopírována do schránky!\n\nMůžete ji přímo vložit do emailového klienta.");
     });
   };
 
@@ -764,7 +775,7 @@ function App() {
   const toggleItem = (category, code) => {
     const key = `${category}-${code}`;
     const product = priceList[category].items.find((p) => p.code === code);
-    
+
     setSelectedItems((prev) => {
       if (prev[key] && prev[key].quantity > 0) {
         // Odškrtnout - smazat úplně z objektu
@@ -789,7 +800,7 @@ function App() {
     const key = `${category}-${code}`;
     const product = priceList[category].items.find((p) => p.code === code);
     const newQuantity = parseInt(quantity) || 0;
-    
+
     setSelectedItems((prev) => {
       if (newQuantity === 0) {
         // Pokud je množství 0, smazat z objektu
@@ -839,7 +850,7 @@ function App() {
     const work = workList[index];
     const key = `work-${index}`;
     const newQuantity = parseInt(quantity) || 0;
-    
+
     setSelectedWork((prev) => {
       if (newQuantity === 0) {
         // Pokud je množství 0, smazat z objektu
@@ -1169,37 +1180,37 @@ function App() {
                   Přehled vybraných položek
                 </h2>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
-                                  {Object.entries(selectedItems)
-                  .filter(([key, val]) => val.quantity > 0)
-                  .map(([key, item]) => {
-                    const discount = getDiscount();
-                    const priceAfterDiscount = item.price * (1 - discount);
-                    return (
-                      <div
-                        key={key}
-                        className="flex justify-between text-sm py-1 border-b"
-                      >
-                        <div>
-                          <div>{item.name}</div>
-                          <div className="text-xs text-gray-500">
-                            {item.code}
-                          </div>
-                        </div>
-                        <div className="text-right">
+                  {Object.entries(selectedItems)
+                    .filter(([key, val]) => val.quantity > 0)
+                    .map(([key, item]) => {
+                      const discount = getDiscount();
+                      const priceAfterDiscount = item.price * (1 - discount);
+                      return (
+                        <div
+                          key={key}
+                          className="flex justify-between text-sm py-1 border-b"
+                        >
                           <div>
-                            {item.quantity}x{" "}
-                            {priceAfterDiscount.toLocaleString("cs-CZ")} Kč
+                            <div>{item.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {item.code}
+                            </div>
                           </div>
-                          <div className="font-semibold">
-                            {(
-                              priceAfterDiscount * item.quantity
-                            ).toLocaleString("cs-CZ")}{" "}
-                            Kč
+                          <div className="text-right">
+                            <div>
+                              {item.quantity}x{" "}
+                              {priceAfterDiscount.toLocaleString("cs-CZ")} Kč
+                            </div>
+                            <div className="font-semibold">
+                              {(
+                                priceAfterDiscount * item.quantity
+                              ).toLocaleString("cs-CZ")}{" "}
+                              Kč
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                   {Object.entries(selectedWork)
                     .filter(([key, val]) => val.quantity > 0)
                     .map(([key, item]) => (
