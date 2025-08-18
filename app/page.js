@@ -858,13 +858,84 @@ function App() {
         delete newWork[key];
         return newWork;
       } else {
-        // Jinak aktualizovat s kompletními informacemi
+        // Jinak aktualizovat s kompletními informacemi, zachovat editovanou cenu
+        const currentPrice = prev[key]?.price || work.price;
         return {
           ...prev,
-          [key]: { name: work.name, price: work.price, quantity: newQuantity },
+          [key]: { name: work.name, price: currentPrice, quantity: newQuantity },
         };
       }
     });
+  };
+
+  // Aktualizace ceny práce
+  const updateWorkPrice = (index, newPrice) => {
+    const workList =
+      heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
+    const work = workList[index];
+    const key = `work-${index}`;
+    
+    setSelectedWork((prev) => {
+      if (prev[key]) {
+        return {
+          ...prev,
+          [key]: { ...prev[key], price: newPrice },
+        };
+      }
+      return prev;
+    });
+  };
+
+  // Uložení nabídky do souboru
+  const saveQuote = () => {
+    const quoteData = {
+      projectName,
+      customerName,
+      customerType,
+      offerDate,
+      selectedItems,
+      selectedWork,
+      heatPumpType,
+      createdAt: new Date().toISOString(),
+      version: "1.1"
+    };
+    
+    const blob = new Blob([JSON.stringify(quoteData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `hotjet-nabidka-${projectName || customerName || 'nova'}-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Načtení nabídky ze souboru
+  const loadQuote = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const quoteData = JSON.parse(e.target.result);
+          
+          // Načtení všech dat z uložené nabídky
+          if (quoteData.projectName !== undefined) setProjectName(quoteData.projectName);
+          if (quoteData.customerName !== undefined) setCustomerName(quoteData.customerName);
+          if (quoteData.customerType !== undefined) setCustomerType(quoteData.customerType);
+          if (quoteData.offerDate !== undefined) setOfferDate(quoteData.offerDate);
+          if (quoteData.selectedItems !== undefined) setSelectedItems(quoteData.selectedItems);
+          if (quoteData.selectedWork !== undefined) setSelectedWork(quoteData.selectedWork);
+          if (quoteData.heatPumpType !== undefined) setHeatPumpType(quoteData.heatPumpType);
+          
+          alert('Nabídka byla úspěšně načtena!');
+        } catch (error) {
+          alert('Chyba při načítání nabídky: ' + error.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+    // Reset input pro možnost načtení stejného souboru znovu
+    event.target.value = '';
   };
 
   // Filtrování kategorií podle typu TČ
@@ -1139,20 +1210,37 @@ function App() {
                         />
                         <div className="flex-1">
                           <div className="text-sm">{work.name}</div>
-                          <div className="text-xs text-gray-500">
-                            {work.price.toLocaleString("cs-CZ")} Kč
+                          <div className="text-xs text-gray-500 flex items-center gap-2">
+                            {isSelected ? (
+                              <>
+                                <span>Cena:</span>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={selectedWork[key]?.price || work.price}
+                                  onChange={(e) => updateWorkPrice(index, parseInt(e.target.value) || 0)}
+                                  className="w-20 px-1 py-0.5 border rounded text-xs"
+                                />
+                                <span>Kč</span>
+                              </>
+                            ) : (
+                              <span>{work.price.toLocaleString("cs-CZ")} Kč</span>
+                            )}
                           </div>
                         </div>
                         {isSelected && (
-                          <input
-                            type="number"
-                            min="0"
-                            value={selectedWork[key]?.quantity || 0}
-                            onChange={(e) =>
-                              updateWorkQuantity(index, e.target.value)
-                            }
-                            className="w-16 px-2 py-1 border rounded"
-                          />
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs">Ks:</span>
+                            <input
+                              type="number"
+                              min="0"
+                              value={selectedWork[key]?.quantity || 0}
+                              onChange={(e) =>
+                                updateWorkQuantity(index, e.target.value)
+                              }
+                              className="w-16 px-2 py-1 border rounded"
+                            />
+                          </div>
                         )}
                       </div>
                     );
@@ -1165,13 +1253,39 @@ function App() {
                 <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
                   Akce
                 </h2>
-                <button
-                  onClick={generateOffer}
-                  className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center justify-center gap-2"
-                >
-                  <FileText size={20} />
-                  Vygenerovat nabídku a zkopírovat HTML
-                </button>
+                
+                <div className="space-y-3">
+                  {/* Generování HTML nabídky */}
+                  <button
+                    onClick={generateOffer}
+                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center justify-center gap-2"
+                  >
+                    <FileText size={20} />
+                    Vygenerovat nabídku a zkopírovat HTML
+                  </button>
+                  
+                  {/* Save/Load nabídky */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={saveQuote}
+                      className="py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Save size={16} />
+                      Uložit nabídku
+                    </button>
+                    
+                    <label className="py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                      <Upload size={16} />
+                      Načíst nabídku
+                      <input
+                        type="file"
+                        accept=".json"
+                        onChange={loadQuote}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
               </div>
 
               {/* Náhled vybraných položek */}
