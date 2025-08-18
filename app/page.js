@@ -490,8 +490,9 @@ function App() {
     }
   };
 
-  // Generování nabídky (HTML + RTF verze)
-  const generateOffer = () => {
+  // Nahraď celou funkci generateOffer() touto verzí:
+
+  const generateOffer = async () => {
     const discount = getDiscount();
     const vat = customerType === "koncovy" ? 0.12 : 0.21;
 
@@ -499,33 +500,21 @@ function App() {
     let accessoriesTotal = 0;
     let workTotal = 0;
 
-    // Sestavení HTML
-    let html = `
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8">
-    <title>Nabídka - ${projectName}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1, h2 { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .total { font-weight: bold; background-color: #f9f9f9; }
-        .section { margin: 30px 0; page-break-inside: avoid; }
-        .description { background-color: #f0f8ff; padding: 10px; margin: 10px 0; border-left: 3px solid #667eea; }
-    </style>
-</head>
-<body>
-    <h1>CENOVÁ NABÍDKA</h1>
+    // HTML pro email - jednodušší styling který funguje v emailových klientech
+    let emailHtml = `
+<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
+  <h1 style="color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px;">CENOVÁ NABÍDKA</h1>
+  
+  <div style="margin: 20px 0;">
     <p><strong>Akce:</strong> ${projectName}</p>
     <p><strong>Zákazník:</strong> ${customerName}</p>
     <p><strong>Datum vystavení:</strong> ${new Date(
       offerDate
     ).toLocaleDateString("cs-CZ")}</p>
     <p><strong>Platnost nabídky:</strong> 30 dní</p>
-    <hr>
+  </div>
+  
+  <hr style="border: 1px solid #ddd;">
 `;
 
     // Zpracování tepelných čerpadel a příslušenství
@@ -533,108 +522,61 @@ function App() {
     const controlCategories = ["C1", "C2", "J"];
 
     // Nejdříve tepelná čerpadla s rozvaděči
-    heatPumpCategories.forEach((cat) => {
+    [...heatPumpCategories, ...controlCategories].forEach((cat) => {
       const items = Object.entries(selectedItems).filter(
         ([key, val]) => key.startsWith(cat + "-") && val.quantity > 0
       );
 
       if (items.length > 0) {
-        html += `<div class="section"><h2>${priceList[cat].name}</h2>`;
-
-        html += `<table>
-          <tr>
-            <th>Kód</th>
-            <th>Popis</th>
-            <th>Cena bez slevy</th>
-            <th>Sleva ${(discount * 100).toFixed(0)}%</th>
-            <th>Cena po slevě</th>
-            <th>Ks</th>
-            <th>Celkem</th>
-          </tr>`;
-
-        items.forEach(([key, item]) => {
-          const priceAfterDiscount = item.price * (1 - discount);
-          const total = priceAfterDiscount * item.quantity;
-          heatPumpTotal += total;
-
-          html += `
-          <tr>
-            <td>${item.code}</td>
-            <td>${item.name}</td>
-            <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
-            <td align="right">${(item.price * discount).toLocaleString(
-              "cs-CZ"
-            )}</td>
-            <td align="right">${priceAfterDiscount.toLocaleString("cs-CZ")}</td>
-            <td align="center">${item.quantity}</td>
-            <td align="right"><strong>${total.toLocaleString(
-              "cs-CZ"
-            )}</strong></td>
-          </tr>`;
-        });
-
-        html += `</table>`;
-
-        if (priceList[cat].description) {
-          html += `<div class="description">${priceList[
-            cat
-          ].description.replace(/\n/g, "<br>")}</div>`;
-        }
-
-        html += `</div>`;
-      }
-    });
-
-    // Rozvaděče a hydromoduly
-    controlCategories.forEach((cat) => {
-      const items = Object.entries(selectedItems).filter(
-        ([key, val]) => key.startsWith(cat + "-") && val.quantity > 0
-      );
-
-      if (items.length > 0) {
-        html += `<div class="section"><h2>${priceList[cat].name}</h2>`;
-
-        html += `<table>
-          <tr>
-            <th>Kód</th>
-            <th>Popis</th>
-            <th>Cena bez slevy</th>
-            <th>Sleva ${(discount * 100).toFixed(0)}%</th>
-            <th>Cena po slevě</th>
-            <th>Ks</th>
-            <th>Celkem</th>
-          </tr>`;
+        emailHtml += `
+        <div style="margin: 30px 0;">
+          <h2 style="color: #333; background: #f5f5f5; padding: 10px;">${priceList[cat].name}</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr style="background: #f0f0f0;">
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Kód</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Popis</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Cena po slevě</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Ks</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Celkem</th>
+            </tr>`;
 
         items.forEach(([key, item]) => {
           const priceAfterDiscount = item.price * (1 - discount);
           const total = priceAfterDiscount * item.quantity;
-          heatPumpTotal += total;
+          if (controlCategories.includes(cat)) {
+            heatPumpTotal += total;
+          } else if (heatPumpCategories.includes(cat)) {
+            heatPumpTotal += total;
+          } else {
+            accessoriesTotal += total;
+          }
 
-          html += `
+          emailHtml += `
           <tr>
-            <td>${item.code}</td>
-            <td>${item.name}</td>
-            <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
-            <td align="right">${(item.price * discount).toLocaleString(
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.code}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${priceAfterDiscount.toLocaleString(
               "cs-CZ"
-            )}</td>
-            <td align="right">${priceAfterDiscount.toLocaleString("cs-CZ")}</td>
-            <td align="center">${item.quantity}</td>
-            <td align="right"><strong>${total.toLocaleString(
+            )} Kč</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
+              item.quantity
+            }</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${total.toLocaleString(
               "cs-CZ"
-            )}</strong></td>
+            )} Kč</strong></td>
           </tr>`;
         });
 
-        html += `</table>`;
+        emailHtml += `</table>`;
 
         if (priceList[cat].description) {
-          html += `<div class="description">${priceList[
-            cat
-          ].description.replace(/\n/g, "<br>")}</div>`;
+          emailHtml += `
+          <div style="background: #e6f2ff; padding: 10px; margin: 10px 0; border-left: 3px solid #0066cc;">
+            ${priceList[cat].description.replace(/\n/g, "<br>")}
+          </div>`;
         }
 
-        html += `</div>`;
+        emailHtml += `</div>`;
       }
     });
 
@@ -650,49 +592,40 @@ function App() {
       );
 
       if (items.length > 0) {
-        html += `<div class="section"><h2>${priceList[cat].name}</h2>`;
-
-        html += `<table>
-          <tr>
-            <th>Kód</th>
-            <th>Popis</th>
-            <th>Cena bez slevy</th>
-            <th>Sleva ${(discount * 100).toFixed(0)}%</th>
-            <th>Cena po slevě</th>
-            <th>Ks</th>
-            <th>Celkem</th>
-          </tr>`;
+        emailHtml += `
+        <div style="margin: 30px 0;">
+          <h2 style="color: #333; background: #f5f5f5; padding: 10px;">${priceList[cat].name}</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr style="background: #f0f0f0;">
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Kód</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Popis</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Cena po slevě</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Ks</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Celkem</th>
+            </tr>`;
 
         items.forEach(([key, item]) => {
           const priceAfterDiscount = item.price * (1 - discount);
           const total = priceAfterDiscount * item.quantity;
           accessoriesTotal += total;
 
-          html += `
+          emailHtml += `
           <tr>
-            <td>${item.code}</td>
-            <td>${item.name}</td>
-            <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
-            <td align="right">${(item.price * discount).toLocaleString(
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.code}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${priceAfterDiscount.toLocaleString(
               "cs-CZ"
-            )}</td>
-            <td align="right">${priceAfterDiscount.toLocaleString("cs-CZ")}</td>
-            <td align="center">${item.quantity}</td>
-            <td align="right"><strong>${total.toLocaleString(
+            )} Kč</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
+              item.quantity
+            }</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${total.toLocaleString(
               "cs-CZ"
-            )}</strong></td>
+            )} Kč</strong></td>
           </tr>`;
         });
 
-        html += `</table>`;
-
-        if (priceList[cat].description) {
-          html += `<div class="description">${priceList[
-            cat
-          ].description.replace(/\n/g, "<br>")}</div>`;
-        }
-
-        html += `</div>`;
+        emailHtml += `</table></div>`;
       }
     });
 
@@ -701,32 +634,38 @@ function App() {
       ([key, val]) => val.quantity > 0
     );
     if (workItems.length > 0) {
-      html += `<div class="section"><h2>Práce a instalační materiál</h2>
-        <p><em>Níže je uveden odhad ceny materiálu, který bude vyúčtován dle skutečné spotřeby v nákupních cenách bez DPH + 15%</em></p>
-        <table>
-          <tr>
-            <th>Popis</th>
-            <th>Cena za jednotku</th>
-            <th>Počet</th>
-            <th>Celkem</th>
+      emailHtml += `
+      <div style="margin: 30px 0;">
+        <h2 style="color: #333; background: #f5f5f5; padding: 10px;">Práce a instalační materiál</h2>
+        <p style="font-style: italic; color: #666;">Níže je uveden odhad ceny materiálu, který bude vyúčtován dle skutečné spotřeby v nákupních cenách bez DPH + 15%</p>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr style="background: #f0f0f0;">
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Popis</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Cena za jednotku</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Počet</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Celkem</th>
           </tr>`;
 
       workItems.forEach(([key, item]) => {
         const total = item.price * item.quantity;
         workTotal += total;
 
-        html += `
-          <tr>
-            <td>${item.name}</td>
-            <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
-            <td align="center">${item.quantity}</td>
-            <td align="right"><strong>${total.toLocaleString(
-              "cs-CZ"
-            )}</strong></td>
-          </tr>`;
+        emailHtml += `
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
+          <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${item.price.toLocaleString(
+            "cs-CZ"
+          )} Kč</td>
+          <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
+            item.quantity
+          }</td>
+          <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${total.toLocaleString(
+            "cs-CZ"
+          )} Kč</strong></td>
+        </tr>`;
       });
 
-      html += `</table></div>`;
+      emailHtml += `</table></div>`;
     }
 
     // Souhrn
@@ -734,133 +673,159 @@ function App() {
     const vatAmount = subtotal * vat;
     const total = subtotal + vatAmount;
 
-    html += `
-    <div class="section">
-      <h2>CELKOVÝ SOUHRN</h2>
-      <table>
-        <tr class="total">
-          <td>Tepelné čerpadlo včetně rozvaděče/hydromodulu</td>
-          <td align="right">${heatPumpTotal.toLocaleString("cs-CZ")} Kč</td>
-        </tr>
-        <tr class="total">
-          <td>Příslušenství</td>
-          <td align="right">${accessoriesTotal.toLocaleString("cs-CZ")} Kč</td>
-        </tr>
-        <tr class="total">
-          <td>Práce a instalační materiál</td>
-          <td align="right">${workTotal.toLocaleString("cs-CZ")} Kč</td>
-        </tr>
-        <tr style="border-top: 2px solid #333;">
-          <td><strong>Mezisoučet</strong></td>
-          <td align="right"><strong>${subtotal.toLocaleString(
+    emailHtml += `
+    <div style="margin: 40px 0; border: 2px solid #667eea; padding: 20px; background: #f8f9ff;">
+      <h2 style="color: #333; margin-top: 0;">CELKOVÝ SOUHRN</h2>
+      <table style="width: 100%;">
+        <tr>
+          <td style="padding: 8px; font-weight: bold;">Tepelné čerpadlo včetně rozvaděče/hydromodulu</td>
+          <td style="padding: 8px; text-align: right; font-weight: bold;">${heatPumpTotal.toLocaleString(
             "cs-CZ"
-          )} Kč</strong></td>
+          )} Kč</td>
         </tr>
         <tr>
-          <td>DPH ${(vat * 100).toFixed(0)}%</td>
-          <td align="right">${vatAmount.toLocaleString("cs-CZ")} Kč</td>
-        </tr>
-        <tr style="background-color: #667eea; color: white;">
-          <td><strong>CELKEM K ÚHRADĚ</strong></td>
-          <td align="right"><strong style="font-size: 1.2em;">${total.toLocaleString(
+          <td style="padding: 8px; font-weight: bold;">Příslušenství</td>
+          <td style="padding: 8px; text-align: right; font-weight: bold;">${accessoriesTotal.toLocaleString(
             "cs-CZ"
-          )} Kč</strong></td>
+          )} Kč</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; font-weight: bold;">Práce a instalační materiál</td>
+          <td style="padding: 8px; text-align: right; font-weight: bold;">${workTotal.toLocaleString(
+            "cs-CZ"
+          )} Kč</td>
+        </tr>
+        <tr style="border-top: 2px solid #333;">
+          <td style="padding: 8px; font-weight: bold;">Mezisoučet</td>
+          <td style="padding: 8px; text-align: right; font-weight: bold;">${subtotal.toLocaleString(
+            "cs-CZ"
+          )} Kč</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px;">DPH ${(vat * 100).toFixed(0)}%</td>
+          <td style="padding: 8px; text-align: right;">${vatAmount.toLocaleString(
+            "cs-CZ"
+          )} Kč</td>
+        </tr>
+        <tr style="background: #667eea; color: white;">
+          <td style="padding: 12px; font-weight: bold; font-size: 1.2em;">CELKEM K ÚHRADĚ</td>
+          <td style="padding: 12px; text-align: right; font-weight: bold; font-size: 1.2em;">${total.toLocaleString(
+            "cs-CZ"
+          )} Kč</td>
         </tr>
       </table>
     </div>
     
-    <p style="margin-top: 30px;">
-      <strong>Platební podmínky:</strong> 50% záloha při objednávce, doplatek při dodání<br>
-      <strong>Dodací lhůta:</strong> 2-4 týdny od objednávky<br>
-      <strong>Kontakt:</strong> info@hotjet.cz | +420 xxx xxx xxx
-    </p>
+    <div style="margin-top: 30px; padding: 20px; background: #f5f5f5;">
+      <p><strong>Platební podmínky:</strong> 50% záloha při objednávce, doplatek při dodání</p>
+      <p><strong>Dodací lhůta:</strong> 2-4 týdny od objednávky</p>
+      <p><strong>Kontakt:</strong> info@hotjet.cz | +420 xxx xxx xxx</p>
+    </div>
+  </div>`;
+
+    // Funkce pro kopírování HTML do schránky
+    const copyHtmlToClipboard = async (html) => {
+      try {
+        // Moderní způsob - Clipboard API s HTML
+        if (navigator.clipboard && window.ClipboardItem) {
+          const blob = new Blob([html], { type: "text/html" });
+          const clipboardItem = new window.ClipboardItem({ "text/html": blob });
+          await navigator.clipboard.write([clipboardItem]);
+          return true;
+        }
+      } catch (err) {
+        console.log(
+          "Moderní clipboard API selhalo, zkouším alternativu...",
+          err
+        );
+      }
+
+      // Alternativa - vytvoření dočasného elementu
+      try {
+        const tempDiv = document.createElement("div");
+        tempDiv.style.position = "fixed";
+        tempDiv.style.pointerEvents = "none";
+        tempDiv.style.opacity = "0";
+        tempDiv.innerHTML = html;
+        document.body.appendChild(tempDiv);
+
+        const range = document.createRange();
+        range.selectNodeContents(tempDiv);
+
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        document.execCommand("copy");
+        selection.removeAllRanges();
+        document.body.removeChild(tempDiv);
+
+        return true;
+      } catch (err) {
+        console.error("Kopírování selhalo:", err);
+        return false;
+      }
+    };
+
+    // Zkopírovat do schránky
+    const success = await copyHtmlToClipboard(emailHtml);
+
+    if (success) {
+      alert(
+        `✅ Nabídka byla zkopírována do schránky!\n\n📧 Můžete ji nyní vložit přímo do emailu (Ctrl+V / Cmd+V).\n\n💡 Tip: Ve většině emailových klientů zachová formátování.`
+      );
+    } else {
+      // Pokud kopírování selhalo, otevři nové okno s HTML
+      const newWindow = window.open("", "_blank");
+      newWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Nabídka - ${projectName}</title>
+        <meta charset="UTF-8">
+      </head>
+      <body>
+        ${emailHtml}
+        <div style="position: fixed; top: 10px; right: 10px; background: #667eea; color: white; padding: 10px; border-radius: 5px;">
+          Označte vše (Ctrl+A) a zkopírujte (Ctrl+C)
+        </div>
+      </body>
+      </html>
+    `);
+      newWindow.document.close();
+
+      alert(
+        "📋 Nabídka byla otevřena v novém okně.\n\nPoužijte Ctrl+A pro označení všeho a Ctrl+C pro zkopírování."
+      );
+    }
+
+    // Dodatečně nabídnout stažení jako HTML soubor
+    const fullHtml = `<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Nabídka - ${projectName}</title>
+</head>
+<body>
+  ${emailHtml}
 </body>
 </html>`;
 
-    // Generování RTF verze pro email
-    const generateRTFVersion = () => {
-      const customerTypeText = customerType === "koncovy" 
-        ? "Koncový zákazník" 
-        : customerType === "montazni" 
-        ? "Montážní firma" 
-        : "Montážní firma+";
+    const blob = new Blob([fullHtml], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `nabidka-${projectName || customerName || "hotjet"}-${
+      new Date().toISOString().split("T")[0]
+    }.html`;
 
-      // RTF header
-      let rtfContent = `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;} {\\f1 Arial;}}
-{\\colortbl;\\red0\\green0\\blue0;\\red255\\green255\\blue255;\\red0\\green102\\blue204;\\red51\\green51\\blue51;}
-\\paperw11906\\paperh16838\\margl1134\\margr1134\\margt1134\\margb1134
-
-{\\f1\\fs28\\b\\cf3 CENOVÁ NABÍDKA}\\par
-{\\f1\\fs22\\b ${projectName || "Nový projekt"}}\\par\\par
-
-{\\f1\\fs20\\b Základní údaje:}\\par
-{\\f1\\fs18 Zákazník: ${customerName || "..."}}\\par
-{\\f1\\fs18 Datum: ${new Date(offerDate).toLocaleDateString("cs-CZ")}}\\par
-{\\f1\\fs18 Platnost nabídky: 30 dní}\\par
-{\\f1\\fs18 Typ zákazníka: ${customerTypeText}}\\par
-{\\f1\\fs18 Sleva: ${(discount * 100).toFixed(0)}%}\\par\\par
-`;
-
-      // Produkty
-      const productItems = Object.values(selectedItems).filter(item => item.quantity > 0);
-      if (productItems.length > 0) {
-        rtfContent += `{\\f1\\fs20\\b Vybrané produkty:}\\par`;
-        
-        productItems.forEach(item => {
-          const priceAfterDiscount = item.price * (1 - discount);
-          const total = priceAfterDiscount * item.quantity;
-          
-          rtfContent += `{\\f1\\fs18\\b ${item.name}}\\par`;
-          rtfContent += `{\\f1\\fs16 Kód: ${item.code}}\\par`;
-          rtfContent += `{\\f1\\fs16 Cena: ${item.price.toLocaleString("cs-CZ")} Kč → ${priceAfterDiscount.toLocaleString("cs-CZ")} Kč (po slevě)}\\par`;
-          rtfContent += `{\\f1\\fs16 Množství: ${item.quantity} ks | Celkem: \\b ${total.toLocaleString("cs-CZ")} Kč}\\par\\par`;
-        });
+    // Přidat tlačítko pro stažení do UI místo automatického stažení
+    setTimeout(() => {
+      if (confirm("💾 Chcete také stáhnout nabídku jako HTML soubor?")) {
+        a.click();
       }
-
-      // Práce
-      const workItems = Object.values(selectedWork).filter(work => work.quantity > 0);
-      if (workItems.length > 0) {
-        rtfContent += `{\\f1\\fs20\\b Práce a materiál:}\\par`;
-        
-        workItems.forEach(work => {
-          const total = work.price * work.quantity;
-          rtfContent += `{\\f1\\fs16 ${work.name}}\\par`;
-          rtfContent += `{\\f1\\fs16 Cena: ${work.price.toLocaleString("cs-CZ")} Kč | Množství: ${work.quantity} ks | Celkem: \\b ${total.toLocaleString("cs-CZ")} Kč}\\par\\par`;
-        });
-      }
-
-      // Celkový souhrn
-      rtfContent += `{\\f1\\fs20\\b\\cf3 CELKOVÝ SOUHRN:}\\par`;
-      rtfContent += `{\\f1\\fs16 Tepelná čerpadla a rozvaděče: ${heatPumpTotal.toLocaleString("cs-CZ")} Kč}\\par`;
-      rtfContent += `{\\f1\\fs16 Příslušenství: ${accessoriesTotal.toLocaleString("cs-CZ")} Kč}\\par`;
-      rtfContent += `{\\f1\\fs16 Práce a materiál: ${workTotal.toLocaleString("cs-CZ")} Kč}\\par`;
-      rtfContent += `{\\f1\\fs16 ________________________________________________}\\par`;
-      rtfContent += `{\\f1\\fs16 Mezisoučet: ${subtotal.toLocaleString("cs-CZ")} Kč}\\par`;
-      rtfContent += `{\\f1\\fs16 DPH ${(vat * 100).toFixed(0)}%: ${vatAmount.toLocaleString("cs-CZ")} Kč}\\par`;
-      rtfContent += `{\\f1\\fs18\\b\\cf3 CELKEM K ÚHRADĚ: ${total.toLocaleString("cs-CZ")} Kč}\\par\\par`;
-
-      // Platební podmínky
-      rtfContent += `{\\f1\\fs18\\b Platební podmínky:}\\par`;
-      rtfContent += `{\\f1\\fs16 • 50% záloha při objednávce}\\par`;
-      rtfContent += `{\\f1\\fs16 • Doplatek při dodání}\\par`;
-      rtfContent += `{\\f1\\fs16 • Dodací lhůta: 2-4 týdny}\\par\\par`;
-      
-      rtfContent += `{\\f1\\fs16 Kontakt: info@hotjet.cz | +420 xxx xxx xxx}\\par`;
-      rtfContent += `{\\f1\\fs14\\i Nabídka vygenerována systémem HOTJET}\\par`;
-      
-      // RTF footer
-      rtfContent += `}`;
-
-      return rtfContent;
-    };
-
-    // Kopírování RTF verze do schránky
-    const rtfVersion = generateRTFVersion();
-    navigator.clipboard.writeText(rtfVersion).then(() => {
-      alert(
-        "📧 Profesionální RTF nabídka byla zkopírována do schránky!\n\nVložte ji do emailu nebo Word dokumentu - automaticky se naformátuje."
-      );
-    });
+      URL.revokeObjectURL(url);
+    }, 1000);
   };
 
   // Toggle výběr položky
@@ -1445,18 +1410,22 @@ function App() {
                             <h4 className="font-semibold text-gray-700 mb-3 bg-gray-50 p-2 rounded">
                               {category}. {priceList[category]?.name}
                             </h4>
-                            
+
                             {/* Popis kategorie */}
                             {priceList[category]?.description && (
                               <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-200 rounded-r">
                                 <div className="text-sm text-gray-700 whitespace-pre-line">
-                                  {priceList[category].description.split('\n').map((line, index) => (
-                                    <div key={index} className="mb-1">{line}</div>
-                                  ))}
+                                  {priceList[category].description
+                                    .split("\n")
+                                    .map((line, index) => (
+                                      <div key={index} className="mb-1">
+                                        {line}
+                                      </div>
+                                    ))}
                                 </div>
                               </div>
                             )}
-                            
+
                             <div className="space-y-2">
                               {priceList[category]?.items.map((item) => {
                                 const key = `${category}-${item.code}`;
