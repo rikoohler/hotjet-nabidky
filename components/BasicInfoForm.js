@@ -18,7 +18,8 @@ const BasicInfoForm = ({
   discount,
   setDiscount,
 }) => {
-  const [showInstallationDiscount, setShowInstallationDiscount] = useState(false);
+  const [showInstallationDiscount, setShowInstallationDiscount] =
+    useState(false);
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
 
@@ -159,9 +160,9 @@ const BasicInfoForm = ({
           </h3>
           <div className="flex gap-2">
             <button
-              onClick={() => setDiscount(0.10)}
+              onClick={() => setDiscount(0.1)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                discount === 0.10
+                discount === 0.1
                   ? "bg-blue-600 text-white"
                   : "bg-white border border-blue-300 text-blue-700 hover:bg-blue-50"
               }`}
@@ -179,9 +180,9 @@ const BasicInfoForm = ({
               15%
             </button>
             <button
-              onClick={() => setDiscount(0.20)}
+              onClick={() => setDiscount(0.2)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                discount === 0.20
+                discount === 0.2
                   ? "bg-blue-600 text-white"
                   : "bg-white border border-blue-300 text-blue-700 hover:bg-blue-50"
               }`}
@@ -229,9 +230,7 @@ const BasicInfoForm = ({
               Odeslat
             </button>
           </div>
-          {pinError && (
-            <p className="text-sm text-red-600 mt-2">{pinError}</p>
-          )}
+          {pinError && <p className="text-sm text-red-600 mt-2">{pinError}</p>}
         </div>
       )}
 
@@ -243,9 +242,9 @@ const BasicInfoForm = ({
           </h3>
           <div className="flex gap-2">
             <button
-              onClick={() => setDiscount(0.10)}
+              onClick={() => setDiscount(0.1)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                discount === 0.10
+                discount === 0.1
                   ? "bg-green-600 text-white"
                   : "bg-white border border-green-300 text-green-700 hover:bg-green-50"
               }`}
@@ -263,9 +262,9 @@ const BasicInfoForm = ({
               15%
             </button>
             <button
-              onClick={() => setDiscount(0.20)}
+              onClick={() => setDiscount(0.2)}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                discount === 0.20
+                discount === 0.2
                   ? "bg-green-600 text-white"
                   : "bg-white border border-green-300 text-green-700 hover:bg-green-50"
               }`}

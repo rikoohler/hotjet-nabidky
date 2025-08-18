@@ -193,16 +193,18 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <img 
-                src="/hotjet-logo.svg" 
-                alt="HOTJET Logo" 
+              <img
+                src="/hotjet-logo.svg"
+                alt="HOTJET Logo"
                 className="h-12 w-auto"
               />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
                   HOTJET - Generátor nabídek
                 </h1>
-                <p className="text-sm text-gray-600">Tepelná čerpadla vzduch-voda a země/voda-voda</p>
+                <p className="text-sm text-gray-600">
+                  Tepelná čerpadla vzduch-voda a země/voda-voda
+                </p>
               </div>
             </div>
             <div className="flex space-x-4">

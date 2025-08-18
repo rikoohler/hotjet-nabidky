@@ -16,7 +16,12 @@ const EmailGenerator = ({
   loadQuote,
 }) => {
   const generateEmailContent = () => {
-    const totals = calculateTotals(selectedItems, selectedWork, customerType, discount);
+    const totals = calculateTotals(
+      selectedItems,
+      selectedWork,
+      customerType,
+      discount
+    );
 
     // Kategorie pro správné rozdělení
     const heatPumpCategories = ["A", "B", "D", "E", "F", "G", "H"];
