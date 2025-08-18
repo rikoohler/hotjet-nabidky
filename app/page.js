@@ -555,15 +555,15 @@ function App() {
           <tr>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.code}</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${Math.round(priceAfterDiscount).toLocaleString(
-              "cs-CZ"
-            )} Kč</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${Math.round(
+              priceAfterDiscount
+            ).toLocaleString("cs-CZ")} Kč</td>
             <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
               item.quantity
             }</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${Math.round(total).toLocaleString(
-              "cs-CZ"
-            )} Kč</strong></td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${Math.round(
+              total
+            ).toLocaleString("cs-CZ")} Kč</strong></td>
           </tr>`;
         });
 
@@ -613,15 +613,15 @@ function App() {
           <tr>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.code}</td>
             <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${Math.round(priceAfterDiscount).toLocaleString(
-              "cs-CZ"
-            )} Kč</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${Math.round(
+              priceAfterDiscount
+            ).toLocaleString("cs-CZ")} Kč</td>
             <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
               item.quantity
             }</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${Math.round(total).toLocaleString(
-              "cs-CZ"
-            )} Kč</strong></td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${Math.round(
+              total
+            ).toLocaleString("cs-CZ")} Kč</strong></td>
           </tr>`;
         });
 
@@ -653,15 +653,15 @@ function App() {
         emailHtml += `
         <tr>
           <td style="border: 1px solid #ddd; padding: 8px;">${item.name}</td>
-          <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${Math.round(item.price).toLocaleString(
-            "cs-CZ"
-          )} Kč</td>
+          <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${Math.round(
+            item.price
+          ).toLocaleString("cs-CZ")} Kč</td>
           <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${
             item.quantity
           }</td>
-          <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${Math.round(total).toLocaleString(
-            "cs-CZ"
-          )} Kč</strong></td>
+          <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>${Math.round(
+            total
+          ).toLocaleString("cs-CZ")} Kč</strong></td>
         </tr>`;
       });
 
@@ -679,39 +679,39 @@ function App() {
       <table style="width: 100%;">
         <tr>
           <td style="padding: 8px; font-weight: bold;">Tepelné čerpadlo včetně rozvaděče/hydromodulu</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(heatPumpTotal).toLocaleString(
-            "cs-CZ"
-          )} Kč</td>
+          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(
+            heatPumpTotal
+          ).toLocaleString("cs-CZ")} Kč</td>
         </tr>
         <tr>
           <td style="padding: 8px; font-weight: bold;">Příslušenství</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(accessoriesTotal).toLocaleString(
-            "cs-CZ"
-          )} Kč</td>
+          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(
+            accessoriesTotal
+          ).toLocaleString("cs-CZ")} Kč</td>
         </tr>
         <tr>
           <td style="padding: 8px; font-weight: bold;">Práce a instalační materiál</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(workTotal).toLocaleString(
-            "cs-CZ"
-          )} Kč</td>
+          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(
+            workTotal
+          ).toLocaleString("cs-CZ")} Kč</td>
         </tr>
         <tr style="border-top: 2px solid #333;">
           <td style="padding: 8px; font-weight: bold;">Mezisoučet</td>
-          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(subtotal).toLocaleString(
-            "cs-CZ"
-          )} Kč</td>
+          <td style="padding: 8px; text-align: right; font-weight: bold;">${Math.round(
+            subtotal
+          ).toLocaleString("cs-CZ")} Kč</td>
         </tr>
         <tr>
           <td style="padding: 8px;">DPH ${(vat * 100).toFixed(0)}%</td>
-          <td style="padding: 8px; text-align: right;">${Math.round(vatAmount).toLocaleString(
-            "cs-CZ"
-          )} Kč</td>
+          <td style="padding: 8px; text-align: right;">${Math.round(
+            vatAmount
+          ).toLocaleString("cs-CZ")} Kč</td>
         </tr>
         <tr style="background: #667eea; color: white;">
           <td style="padding: 12px; font-weight: bold; font-size: 1.2em;">CELKEM K ÚHRADĚ</td>
-          <td style="padding: 12px; text-align: right; font-weight: bold; font-size: 1.2em;">${Math.round(total).toLocaleString(
-            "cs-CZ"
-          )} Kč</td>
+          <td style="padding: 12px; text-align: right; font-weight: bold; font-size: 1.2em;">${Math.round(
+            total
+          ).toLocaleString("cs-CZ")} Kč</td>
         </tr>
       </table>
     </div>
@@ -1189,7 +1189,7 @@ function App() {
                       placeholder="např. Rodinný dům Novákovi"
                     />
                   </div>
-                  
+
                   {/* Druhý řádek - Zákazník a datum v jednom řádku */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -1216,7 +1216,7 @@ function App() {
                       />
                     </div>
                   </div>
-                  
+
                   {/* Třetí řádek - Typ zákazníka */}
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -1258,7 +1258,7 @@ function App() {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Čtvrtý řádek - Typ TČ */}
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -1475,7 +1475,10 @@ function App() {
                                       <div className="text-sm">{item.name}</div>
                                       <div className="text-xs text-gray-500">
                                         {item.code} -{" "}
-                                        {Math.round(item.price).toLocaleString("cs-CZ")} Kč
+                                        {Math.round(item.price).toLocaleString(
+                                          "cs-CZ"
+                                        )}{" "}
+                                        Kč
                                       </div>
                                     </div>
                                     {isSelected && (
@@ -1552,7 +1555,8 @@ function App() {
                               </>
                             ) : (
                               <span>
-                                {Math.round(work.price).toLocaleString("cs-CZ")} Kč
+                                {Math.round(work.price).toLocaleString("cs-CZ")}{" "}
+                                Kč
                               </span>
                             )}
                           </div>
@@ -1642,10 +1646,16 @@ function App() {
                           <div className="text-right mr-2">
                             <div>
                               {item.quantity}x{" "}
-                              {Math.round(priceAfterDiscount).toLocaleString("cs-CZ")} Kč
+                              {Math.round(priceAfterDiscount).toLocaleString(
+                                "cs-CZ"
+                              )}{" "}
+                              Kč
                             </div>
                             <div className="font-semibold">
-                              {Math.round(priceAfterDiscount * item.quantity).toLocaleString("cs-CZ")} Kč
+                              {Math.round(
+                                priceAfterDiscount * item.quantity
+                              ).toLocaleString("cs-CZ")}{" "}
+                              Kč
                             </div>
                           </div>
                           <button
@@ -1675,7 +1685,10 @@ function App() {
                             {Math.round(item.price).toLocaleString("cs-CZ")} Kč
                           </div>
                           <div className="font-semibold">
-                            {Math.round(item.price * item.quantity).toLocaleString("cs-CZ")} Kč
+                            {Math.round(
+                              item.price * item.quantity
+                            ).toLocaleString("cs-CZ")}{" "}
+                            Kč
                           </div>
                         </div>
                         <button
@@ -1688,29 +1701,38 @@ function App() {
                       </div>
                     ))}
                 </div>
-                
+
                 {/* Součet bez DPH */}
-                {(Object.keys(selectedItems).length > 0 || Object.keys(selectedWork).length > 0) && (
+                {(Object.keys(selectedItems).length > 0 ||
+                  Object.keys(selectedWork).length > 0) && (
                   <div className="mt-4 pt-4 border-t">
                     <div className="text-right space-y-1">
                       <div className="text-sm text-gray-600">
-                        Celkem bez DPH: <span className="font-semibold">
+                        Celkem bez DPH:{" "}
+                        <span className="font-semibold">
                           {Math.round(
                             Object.entries(selectedItems)
                               .filter(([key, val]) => val.quantity > 0)
                               .reduce((sum, [key, item]) => {
                                 const discount = getDiscount();
-                                const priceAfterDiscount = item.price * (1 - discount);
-                                return sum + (priceAfterDiscount * item.quantity);
+                                const priceAfterDiscount =
+                                  item.price * (1 - discount);
+                                return sum + priceAfterDiscount * item.quantity;
                               }, 0) +
-                            Object.entries(selectedWork)
-                              .filter(([key, val]) => val.quantity > 0)
-                              .reduce((sum, [key, item]) => sum + (item.price * item.quantity), 0)
-                          ).toLocaleString("cs-CZ")} Kč
+                              Object.entries(selectedWork)
+                                .filter(([key, val]) => val.quantity > 0)
+                                .reduce(
+                                  (sum, [key, item]) =>
+                                    sum + item.price * item.quantity,
+                                  0
+                                )
+                          ).toLocaleString("cs-CZ")}{" "}
+                          Kč
                         </span>
                       </div>
                       <div className="text-xs text-gray-500">
-                        DPH {customerType === "koncovy" ? "12%" : "21%"} se přidá při generování nabídky
+                        DPH {customerType === "koncovy" ? "12%" : "21%"} se
+                        přidá při generování nabídky
                       </div>
                     </div>
                   </div>
