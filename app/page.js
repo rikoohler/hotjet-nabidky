@@ -1290,6 +1290,30 @@ Nabídka vygenerována systémem HOTJET
                 <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
                   Výběr položek - {heatPumpType === "vzduch" ? "Vzduch-voda" : "Země/Voda-voda"}
                 </h2>
+
+                {/* Rychlý přehled vybraných položek */}
+                {Object.keys(selectedItems).length > 0 && (
+                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <h4 className="text-sm font-medium text-green-800 mb-2">
+                      ✓ Vybrané položky ({Object.values(selectedItems).filter(item => item.quantity > 0).length}):
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(selectedItems)
+                        .filter(([key, item]) => item.quantity > 0)
+                        .slice(0, 6)
+                        .map(([key, item]) => (
+                          <span key={key} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                            {item.code} ({item.quantity}x)
+                          </span>
+                        ))}
+                      {Object.values(selectedItems).filter(item => item.quantity > 0).length > 6 && (
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                          +{Object.values(selectedItems).filter(item => item.quantity > 0).length - 6} dalších...
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
                 
                 {/* Navigační kroky */}
                 <div className="mb-6">
