@@ -238,52 +238,186 @@ const EmailGenerator = ({
     return emailHtml;
   };
 
-  const openEmailClient = () => {
+    const openEmailClient = async () => {
     const emailHtml = generateEmailContent();
-    const totals = calculateTotals(selectedItems, selectedWork, customerType);
-
-    // Vytvoření mailto URL s HTML obsahem
-    const subject = encodeURIComponent(
-      `Cenová nabídka - ${projectName || "HOTJET tepelné čerpadlo"}`
-    );
-    const body = encodeURIComponent(emailHtml);
-
-    // Základní mailto URL
-    const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
-
-    // Pokus o otevření email klienta
+    
     try {
-      window.open(mailtoUrl, "_blank");
+      // Moderní Clipboard API s HTML MIME typem
+      if (navigator.clipboard && window.ClipboardItem) {
+        const blob = new Blob([emailHtml], { type: "text/html" });
+        const clipboardItem = new window.ClipboardItem({ "text/html": blob });
+        await navigator.clipboard.write([clipboardItem]);
+        
+        // Otevření email klienta s předvyplněným předmětem
+        const subject = encodeURIComponent(
+          `Cenová nabídka - ${projectName || "HOTJET tepelné čerpadlo"}`
+        );
+        const mailtoUrl = `mailto:?subject=${subject}`;
+        window.open(mailtoUrl, "_blank");
+        
+        alert(`✅ Profesionální nabídka byla zkopírována do schránky!\n\n📧 Email klient byl otevřen.\n\n💡 Vložte obsah z schránky do těla emailu (Ctrl+V / Cmd+V).`);
+      } else {
+        // Fallback na starší metodu
+        const textArea = document.createElement("textarea");
+        textArea.value = emailHtml;
+        document.body.appendChild(textArea);
+        textArea.select();
+        
+        if (document.execCommand("copy")) {
+          document.body.removeChild(textArea);
+          
+          const subject = encodeURIComponent(
+            `Cenová nabídka - ${projectName || "HOTJET tepelné čerpadlo"}`
+          );
+          const mailtoUrl = `mailto:?subject=${subject}`;
+          window.open(mailtoUrl, "_blank");
+          
+          alert(`✅ Nabídka byla zkopírována do schránky!\n\n📧 Email klient byl otevřen.\n\n💡 Vložte obsah z schránky do těla emailu (Ctrl+V / Cmd+V).`);
+        } else {
+          throw new Error("Kopírování selhalo");
+        }
+      }
     } catch (error) {
       console.error("Chyba při otevírání email klienta:", error);
-      alert(
-        "❌ Nepodařilo se otevřít email klienta. Zkopírujte nabídku do schránky a vložte ručně."
-      );
+      
+      // Fallback - otevři nové okno pro ruční kopírování
+      const newWindow = window.open("", "_blank");
+      newWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="cs">
+        <head>
+          <meta charset="UTF-8">
+          <title>Nabídka - ${projectName}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .instructions { background: #f0f8ff; padding: 15px; border: 1px solid #0066cc; margin-bottom: 20px; border-radius: 5px; }
+            .copy-btn { background: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0; }
+            .copy-btn:hover { background: #0052a3; }
+          </style>
+        </head>
+        <body>
+          <div class="instructions">
+            <h3>📋 Instrukce pro kopírování:</h3>
+            <p>1. Klikněte na tlačítko "Kopírovat nabídku" níže</p>
+            <p>2. Otevřete váš email klient</p>
+            <p>3. Vložte obsah do těla emailu (Ctrl+V / Cmd+V)</p>
+          </div>
+          <button class="copy-btn" onclick="copyContent()">📋 Kopírovat nabídku</button>
+          <hr>
+          <div id="content">
+            ${emailHtml}
+          </div>
+          <script>
+            function copyContent() {
+              const content = document.getElementById('content').innerHTML;
+              navigator.clipboard.writeText(content).then(() => {
+                alert('✅ Nabídka byla zkopírována do schránky!');
+              }).catch(() => {
+                // Fallback pro starší prohlížeče
+                const textArea = document.createElement('textarea');
+                textArea.value = content;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ Nabídka byla zkopírována do schránky!');
+              });
+            }
+          </script>
+        </body>
+        </html>
+      `);
+      newWindow.document.close();
+      
+      alert("📋 Nabídka byla otevřena v novém okně.\n\n💡 Použijte tlačítko 'Kopírovat nabídku' a pak vložte do emailu.");
     }
   };
 
-  const copyToClipboard = async () => {
+    const copyToClipboard = async () => {
     const emailHtml = generateEmailContent();
-
+ 
     try {
-      // Moderní způsob - Clipboard API s HTML
+      // Moderní Clipboard API s HTML MIME typem
       if (navigator.clipboard && window.ClipboardItem) {
         const blob = new Blob([emailHtml], { type: "text/html" });
         const clipboardItem = new window.ClipboardItem({ "text/html": blob });
         await navigator.clipboard.write([clipboardItem]);
         alert(
-          `✅ Profesionální nabídka byla zkopírována do schránky!\n\n📧 Můžete ji nyní vložit přímo do emailu (Ctrl+V / Cmd+V).`
+          `✅ Profesionální nabídka byla zkopírována do schránky!\n\n📧 Můžete ji nyní vložit přímo do emailu (Ctrl+V / Cmd+V).\n\n💡 Ve většině emailových klientů zachová formátování.`
         );
       } else {
-        // Fallback - plain text
-        await navigator.clipboard.writeText(emailHtml);
-        alert(
-          "📋 Nabídka byla zkopírována jako HTML text.\n\nPoužijte Ctrl+V pro vložení do emailu."
-        );
+        // Fallback na starší document.execCommand metodu
+        const textArea = document.createElement("textarea");
+        textArea.value = emailHtml;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        if (document.execCommand("copy")) {
+          document.body.removeChild(textArea);
+          alert(
+            `✅ Nabídka byla zkopírována do schránky!\n\n📧 Můžete ji nyní vložit přímo do emailu (Ctrl+V / Cmd+V).`
+          );
+        } else {
+          throw new Error("Kopírování selhalo");
+        }
       }
     } catch (error) {
       console.error("Kopírování selhalo:", error);
-      alert("❌ Chyba při kopírování: " + error.message);
+      
+      // Fallback - otevři nové okno pro ruční kopírování
+      const newWindow = window.open("", "_blank");
+      newWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="cs">
+        <head>
+          <meta charset="UTF-8">
+          <title>Nabídka - ${projectName}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .instructions { background: #f0f8ff; padding: 15px; border: 1px solid #0066cc; margin-bottom: 20px; border-radius: 5px; }
+            .copy-btn { background: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0; }
+            .copy-btn:hover { background: #0052a3; }
+          </style>
+        </head>
+        <body>
+          <div class="instructions">
+            <h3>📋 Instrukce pro kopírování:</h3>
+            <p>1. Klikněte na tlačítko "Kopírovat nabídku" níže</p>
+            <p>2. Otevřete váš email klient</p>
+            <p>3. Vložte obsah do těla emailu (Ctrl+V / Cmd+V)</p>
+          </div>
+          <button class="copy-btn" onclick="copyContent()">📋 Kopírovat nabídku</button>
+          <hr>
+          <div id="content">
+            ${emailHtml}
+          </div>
+          <script>
+            function copyContent() {
+              const content = document.getElementById('content').innerHTML;
+              navigator.clipboard.writeText(content).then(() => {
+                alert('✅ Nabídka byla zkopírována do schránky!');
+              }).catch(() => {
+                // Fallback pro starší prohlížeče
+                const textArea = document.createElement('textarea');
+                textArea.value = content;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ Nabídka byla zkopírována do schránky!');
+              });
+            }
+          </script>
+        </body>
+        </html>
+      `);
+      newWindow.document.close();
+      
+      alert("📋 Nabídka byla otevřena v novém okně.\n\n💡 Použijte tlačítko 'Kopírovat nabídku' a pak vložte do emailu.");
     }
   };
 
@@ -377,25 +511,25 @@ const EmailGenerator = ({
             </label>
           </div>
 
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="text-sm font-medium text-blue-800 mb-2">
-              💡 Tipy pro email:
-            </h4>
-            <ul className="text-xs text-blue-700 space-y-1">
-              <li>
-                • <strong>Otevřít email klienta</strong> - automaticky otevře
-                váš výchozí email program
-              </li>
-              <li>
-                • <strong>Zkopírovat do schránky</strong> - vložíte ručně do
-                jakéhokoliv emailu
-              </li>
-              <li>
-                • <strong>Stáhnout HTML</strong> - uložíte jako soubor pro
-                pozdější použití
-              </li>
-            </ul>
-          </div>
+                     <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+             <h4 className="text-sm font-medium text-blue-800 mb-2">
+               💡 Tipy pro email:
+             </h4>
+             <ul className="text-xs text-blue-700 space-y-1">
+               <li>
+                 • <strong>Otevřít email klienta</strong> - zkopíruje nabídku a otevře email program
+               </li>
+               <li>
+                 • <strong>Zkopírovat do schránky</strong> - zkopíruje s formátováním pro email
+               </li>
+               <li>
+                 • <strong>Stáhnout HTML</strong> - uloží jako soubor pro pozdější použití
+               </li>
+               <li className="text-blue-600 font-medium">
+                 💡 Všechny metody zachovávají profesionální formátování!
+               </li>
+             </ul>
+           </div>
         </div>
       )}
     </div>
