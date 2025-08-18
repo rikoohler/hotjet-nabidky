@@ -120,12 +120,12 @@ const BasicInfoForm = ({
           <div className="flex gap-2">
             <button
               onClick={() => {
-                setHeatPumpType("air");
-                setSelectedCategory("A");
+                setHeatPumpType("vzduch");
+                setSelectedCategory("");
                 setSelectedSubcategory("");
               }}
               className={`flex-1 px-3 py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
-                heatPumpType === "air"
+                heatPumpType === "vzduch"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
@@ -135,12 +135,12 @@ const BasicInfoForm = ({
             </button>
             <button
               onClick={() => {
-                setHeatPumpType("ground");
-                setSelectedCategory("F");
+                setHeatPumpType("zeme");
+                setSelectedCategory("");
                 setSelectedSubcategory("");
               }}
               className={`flex-1 px-3 py-2 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
-                heatPumpType === "ground"
+                heatPumpType === "zeme"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
