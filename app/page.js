@@ -41,7 +41,8 @@ const defaultPriceList = {
   },
   B: {
     name: "Vzduch-voda, venkovní monoblok, R290 (propan)",
-    description: "🌱 Ekologické chladivo R290\n⚡ Vysoká účinnost\n🔇 Nízká hlučnost",
+    description:
+      "🌱 Ekologické chladivo R290\n⚡ Vysoká účinnost\n🔇 Nízká hlučnost",
     items: [
       {
         code: "HJZETXP07",
@@ -435,6 +436,8 @@ function App() {
   const [selectedItems, setSelectedItems] = useState({});
   const [selectedWork, setSelectedWork] = useState({});
   const [heatPumpType, setHeatPumpType] = useState("vzduch");
+  const [selectedCategory, setSelectedCategory] = useState(null); // Pro navigaci kategorií
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null); // Pro navigaci podkategorií
 
   // Výpočet slevy podle typu zákazníka
   const getDiscount = () => {
@@ -559,10 +562,14 @@ function App() {
             <td>${item.code}</td>
             <td>${item.name}</td>
             <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
-            <td align="right">${(item.price * discount).toLocaleString("cs-CZ")}</td>
+            <td align="right">${(item.price * discount).toLocaleString(
+              "cs-CZ"
+            )}</td>
             <td align="right">${priceAfterDiscount.toLocaleString("cs-CZ")}</td>
             <td align="center">${item.quantity}</td>
-            <td align="right"><strong>${total.toLocaleString("cs-CZ")}</strong></td>
+            <td align="right"><strong>${total.toLocaleString(
+              "cs-CZ"
+            )}</strong></td>
           </tr>`;
         });
 
@@ -608,10 +615,14 @@ function App() {
             <td>${item.code}</td>
             <td>${item.name}</td>
             <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
-            <td align="right">${(item.price * discount).toLocaleString("cs-CZ")}</td>
+            <td align="right">${(item.price * discount).toLocaleString(
+              "cs-CZ"
+            )}</td>
             <td align="right">${priceAfterDiscount.toLocaleString("cs-CZ")}</td>
             <td align="center">${item.quantity}</td>
-            <td align="right"><strong>${total.toLocaleString("cs-CZ")}</strong></td>
+            <td align="right"><strong>${total.toLocaleString(
+              "cs-CZ"
+            )}</strong></td>
           </tr>`;
         });
 
@@ -662,10 +673,14 @@ function App() {
             <td>${item.code}</td>
             <td>${item.name}</td>
             <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
-            <td align="right">${(item.price * discount).toLocaleString("cs-CZ")}</td>
+            <td align="right">${(item.price * discount).toLocaleString(
+              "cs-CZ"
+            )}</td>
             <td align="right">${priceAfterDiscount.toLocaleString("cs-CZ")}</td>
             <td align="center">${item.quantity}</td>
-            <td align="right"><strong>${total.toLocaleString("cs-CZ")}</strong></td>
+            <td align="right"><strong>${total.toLocaleString(
+              "cs-CZ"
+            )}</strong></td>
           </tr>`;
         });
 
@@ -705,7 +720,9 @@ function App() {
             <td>${item.name}</td>
             <td align="right">${item.price.toLocaleString("cs-CZ")}</td>
             <td align="center">${item.quantity}</td>
-            <td align="right"><strong>${total.toLocaleString("cs-CZ")}</strong></td>
+            <td align="right"><strong>${total.toLocaleString(
+              "cs-CZ"
+            )}</strong></td>
           </tr>`;
       });
 
@@ -760,14 +777,92 @@ function App() {
 </body>
 </html>`;
 
-    // Kopírování přímo použitelného HTML do schránky (ready pro email)
-    const emailReadyHtml = html.replace(
-      '<body>',
-      '<body style="font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; color: #333;">'
-    );
-    
-    navigator.clipboard.writeText(emailReadyHtml).then(() => {
-      alert("HTML nabídka připravená pro email byla zkopírována do schránky!\n\nMůžete ji přímo vložit do emailového klienta.");
+        // Generování email-ready verze
+    const generateEmailVersion = () => {
+      let emailContent = `CENOVÁ NABÍDKA - ${projectName}
+
+═══════════════════════════════════════════════════════════════
+
+ZÁKLADNÍ ÚDAJE:
+• Zákazník: ${customerName}
+• Datum: ${new Date(offerDate).toLocaleDateString("cs-CZ")}
+• Platnost nabídky: 30 dní
+• Typ zákazníka: ${customerType === "koncovy" ? "Koncový zákazník" : customerType === "montazni" ? "Montážní firma" : "Montážní firma+"}
+• Sleva: ${(discount * 100).toFixed(0)}%
+
+═══════════════════════════════════════════════════════════════
+
+VYBRANÉ PRODUKTY:
+`;
+
+      // Produkty
+      const productItems = Object.values(selectedItems).filter(item => item.quantity > 0);
+      if (productItems.length > 0) {
+        productItems.forEach(item => {
+          const priceAfterDiscount = item.price * (1 - discount);
+          const total = priceAfterDiscount * item.quantity;
+          emailContent += `
+• ${item.name}
+  Kód: ${item.code}
+  Cena: ${item.price.toLocaleString("cs-CZ")} Kč → ${priceAfterDiscount.toLocaleString("cs-CZ")} Kč (po slevě)
+  Množství: ${item.quantity} ks
+  Celkem: ${total.toLocaleString("cs-CZ")} Kč
+`;
+        });
+      }
+
+      // Práce
+      const workItems = Object.values(selectedWork).filter(work => work.quantity > 0);
+      if (workItems.length > 0) {
+        emailContent += `
+
+PRÁCE A MATERIÁL:
+`;
+        workItems.forEach(work => {
+          const total = work.price * work.quantity;
+          emailContent += `
+• ${work.name}
+  Cena: ${work.price.toLocaleString("cs-CZ")} Kč
+  Množství: ${work.quantity} ks
+  Celkem: ${total.toLocaleString("cs-CZ")} Kč
+`;
+        });
+      }
+
+      // Celková cena
+      emailContent += `
+
+═══════════════════════════════════════════════════════════════
+CELKOVÝ SOUHRN:
+
+Tepelná čerpadla a rozvaděče: ${heatPumpTotal.toLocaleString("cs-CZ")} Kč
+Příslušenství: ${accessoriesTotal.toLocaleString("cs-CZ")} Kč
+Práce a materiál: ${workTotal.toLocaleString("cs-CZ")} Kč
+───────────────────────────────────────────
+Mezisoučet: ${subtotal.toLocaleString("cs-CZ")} Kč
+DPH ${(vat * 100).toFixed(0)}%: ${vatAmount.toLocaleString("cs-CZ")} Kč
+═══════════════════════════════════════════
+CELKEM K ÚHRADĚ: ${total.toLocaleString("cs-CZ")} Kč
+═══════════════════════════════════════════
+
+PLATEBNÍ PODMÍNKY:
+• 50% záloha při objednávce
+• Doplatek při dodání
+• Dodací lhůta: 2-4 týdny
+
+Kontakt: info@hotjet.cz | +420 xxx xxx xxx
+
+---
+Nabídka vygenerována systémem HOTJET
+`;
+
+      return emailContent;
+    };
+
+    // Kopírování email-ready verze do schránky
+    const emailVersion = generateEmailVersion();
+    navigator.clipboard.writeText(emailVersion).then(() => {
+      alert("📧 Nabídka ve formátu pro email byla zkopírována do schránky!\n\nMůžete ji přímo vložit do emailu jako text.");
     });
   };
 
@@ -862,7 +957,11 @@ function App() {
         const currentPrice = prev[key]?.price || work.price;
         return {
           ...prev,
-          [key]: { name: work.name, price: currentPrice, quantity: newQuantity },
+          [key]: {
+            name: work.name,
+            price: currentPrice,
+            quantity: newQuantity,
+          },
         };
       }
     });
@@ -874,7 +973,7 @@ function App() {
       heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
     const work = workList[index];
     const key = `work-${index}`;
-    
+
     setSelectedWork((prev) => {
       if (prev[key]) {
         return {
@@ -897,14 +996,18 @@ function App() {
       selectedWork,
       heatPumpType,
       createdAt: new Date().toISOString(),
-      version: "1.1"
+      version: "1.1",
     };
-    
-    const blob = new Blob([JSON.stringify(quoteData, null, 2)], { type: 'application/json' });
+
+    const blob = new Blob([JSON.stringify(quoteData, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `hotjet-nabidka-${projectName || customerName || 'nova'}-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `hotjet-nabidka-${projectName || customerName || "nova"}-${
+      new Date().toISOString().split("T")[0]
+    }.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -917,49 +1020,103 @@ function App() {
       reader.onload = (e) => {
         try {
           const quoteData = JSON.parse(e.target.result);
-          
+
           // Načtení všech dat z uložené nabídky
-          if (quoteData.projectName !== undefined) setProjectName(quoteData.projectName);
-          if (quoteData.customerName !== undefined) setCustomerName(quoteData.customerName);
-          if (quoteData.customerType !== undefined) setCustomerType(quoteData.customerType);
-          if (quoteData.offerDate !== undefined) setOfferDate(quoteData.offerDate);
-          if (quoteData.selectedItems !== undefined) setSelectedItems(quoteData.selectedItems);
-          if (quoteData.selectedWork !== undefined) setSelectedWork(quoteData.selectedWork);
-          if (quoteData.heatPumpType !== undefined) setHeatPumpType(quoteData.heatPumpType);
-          
-          alert('Nabídka byla úspěšně načtena!');
+          if (quoteData.projectName !== undefined)
+            setProjectName(quoteData.projectName);
+          if (quoteData.customerName !== undefined)
+            setCustomerName(quoteData.customerName);
+          if (quoteData.customerType !== undefined)
+            setCustomerType(quoteData.customerType);
+          if (quoteData.offerDate !== undefined)
+            setOfferDate(quoteData.offerDate);
+          if (quoteData.selectedItems !== undefined)
+            setSelectedItems(quoteData.selectedItems);
+          if (quoteData.selectedWork !== undefined)
+            setSelectedWork(quoteData.selectedWork);
+          if (quoteData.heatPumpType !== undefined)
+            setHeatPumpType(quoteData.heatPumpType);
+
+          alert("Nabídka byla úspěšně načtena!");
         } catch (error) {
-          alert('Chyba při načítání nabídky: ' + error.message);
+          alert("Chyba při načítání nabídky: " + error.message);
         }
       };
       reader.readAsText(file);
     }
     // Reset input pro možnost načtení stejného souboru znovu
-    event.target.value = '';
+    event.target.value = "";
   };
 
-  // Filtrování kategorií podle typu TČ
+  // Nová struktura kategorií podle typu TČ
+  const getCategoryStructure = () => {
+    if (heatPumpType === "vzduch") {
+      return {
+        heatPumps: {
+          name: "Tepelná čerpadla vzduch-voda",
+          subcategories: {
+            basic: { name: "Základní série", categories: ["A", "B", "D", "E"] },
+            highTemp: { name: "Vysokoteplotní", categories: ["H"] }
+          }
+        },
+        controllers: {
+          name: "Rozvaděče a hydromoduly", 
+          subcategories: {
+            basic: { name: "Pro základní série", categories: ["C1", "C2"] },
+            highTemp: { name: "Pro vysokoteplotní", categories: ["J"] }
+          }
+        },
+        accessories: {
+          name: "Příslušenství",
+          subcategories: {
+            all: { name: "Vše", categories: ["M", "N", "O", "P", "Q", "R", "S", "T", "Z"] }
+          }
+        }
+      };
+    } else {
+      return {
+        heatPumps: {
+          name: "Tepelná čerpadla země/voda-voda",
+          subcategories: {
+            water: { name: "Voda-voda", categories: ["F"] },
+            ground: { name: "Země-voda", categories: ["G"] }
+          }
+        },
+        accessories: {
+          name: "Příslušenství",
+          subcategories: {
+            all: { name: "Vše", categories: ["M", "N", "O", "P", "Q", "R", "S", "T", "Z"] }
+          }
+        }
+      };
+    }
+  };
+
+  // Získání kategorií pro aktuální výběr
+  const getDisplayCategories = () => {
+    const structure = getCategoryStructure();
+    
+    if (!selectedCategory) {
+      return [];
+    }
+    
+    if (!selectedSubcategory) {
+      return [];
+    }
+    
+    const category = structure[selectedCategory];
+    if (!category) return [];
+    
+    const subcategory = category.subcategories[selectedSubcategory];
+    if (!subcategory) return [];
+    
+    return subcategory.categories;
+  };
+
+  // Legacy funkce pro zpětnou kompatibilitu (používá se v HTML generování)
   const getFilteredCategories = () => {
     if (heatPumpType === "vzduch") {
-      return [
-        "A",
-        "B",
-        "C1",
-        "C2",
-        "D",
-        "E",
-        "H",
-        "J",
-        "M",
-        "N",
-        "O",
-        "P",
-        "Q",
-        "R",
-        "S",
-        "T",
-        "Z",
-      ];
+      return ["A", "B", "C1", "C2", "D", "E", "H", "J", "M", "N", "O", "P", "Q", "R", "S", "T", "Z"];
     } else {
       return ["F", "G", "M", "N", "O", "P", "Q", "R", "S", "T", "Z"];
     }
@@ -1098,8 +1255,8 @@ function App() {
                       <button
                         onClick={() => {
                           setHeatPumpType("vzduch");
-                          setSelectedItems({});
-                          setSelectedWork({});
+                          setSelectedCategory(null);
+                          setSelectedSubcategory(null);
                         }}
                         className={`py-2 px-4 rounded-lg border-2 transition-all ${
                           heatPumpType === "vzduch"
@@ -1112,8 +1269,8 @@ function App() {
                       <button
                         onClick={() => {
                           setHeatPumpType("zeme");
-                          setSelectedItems({});
-                          setSelectedWork({});
+                          setSelectedCategory(null);
+                          setSelectedSubcategory(null);
                         }}
                         className={`py-2 px-4 rounded-lg border-2 transition-all ${
                           heatPumpType === "zeme"
@@ -1128,60 +1285,133 @@ function App() {
                 </div>
               </div>
 
-              {/* Výběr položek */}
+              {/* Nová stromová navigace */}
               <div className="bg-white rounded-xl shadow-md p-6 max-h-screen overflow-y-auto">
                 <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-                  Výběr položek
+                  Výběr položek - {heatPumpType === "vzduch" ? "Vzduch-voda" : "Země/Voda-voda"}
                 </h2>
-                <div className="space-y-6">
-                  {getFilteredCategories().map((category) => (
-                    <div key={category} className="border-b pb-4">
-                      <h3 className="font-semibold text-gray-700 mb-3">
-                        {priceList[category].name}
-                      </h3>
-                      <div className="space-y-2">
-                        {priceList[category].items.map((item) => {
-                          const key = `${category}-${item.code}`;
-                          const isSelected = selectedItems[key]?.quantity > 0;
-                          return (
-                            <div
-                              key={item.code}
-                              className="flex items-center gap-3"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={isSelected}
-                                onChange={() => toggleItem(category, item.code)}
-                                className="w-4 h-4 text-blue-600"
-                              />
-                              <div className="flex-1">
-                                <div className="text-sm">{item.name}</div>
-                                <div className="text-xs text-gray-500">
-                                  {item.code} -{" "}
-                                  {item.price.toLocaleString("cs-CZ")} Kč
-                                </div>
-                              </div>
-                              {isSelected && (
-                                <input
-                                  type="number"
-                                  min="0"
-                                  value={selectedItems[key]?.quantity || 0}
-                                  onChange={(e) =>
-                                    updateQuantity(
-                                      category,
-                                      item.code,
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-16 px-2 py-1 border rounded"
-                                />
-                              )}
+                
+                {/* Navigační kroky */}
+                <div className="mb-6">
+                  {/* Krok 1: Výběr hlavní kategorie */}
+                  {!selectedCategory && (
+                    <div className="space-y-3">
+                      <h3 className="font-medium text-gray-700">1. Vyberte kategorii:</h3>
+                      <div className="grid gap-3">
+                        {Object.entries(getCategoryStructure()).map(([categoryKey, categoryData]) => (
+                          <button
+                            key={categoryKey}
+                            onClick={() => setSelectedCategory(categoryKey)}
+                            className="text-left p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all"
+                          >
+                            <div className="font-medium text-gray-800">{categoryData.name}</div>
+                            <div className="text-sm text-gray-500 mt-1">
+                              {Object.keys(categoryData.subcategories).length} skupin dostupných
                             </div>
-                          );
-                        })}
+                          </button>
+                        ))}
                       </div>
                     </div>
-                  ))}
+                  )}
+
+                  {/* Krok 2: Výběr podkategorie */}
+                  {selectedCategory && !selectedSubcategory && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 mb-3">
+                        <button
+                          onClick={() => setSelectedCategory(null)}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          ← Zpět
+                        </button>
+                        <h3 className="font-medium text-gray-700">
+                          2. Vyberte skupinu v kategorii "{getCategoryStructure()[selectedCategory]?.name}":
+                        </h3>
+                      </div>
+                      <div className="grid gap-3">
+                        {Object.entries(getCategoryStructure()[selectedCategory]?.subcategories || {}).map(([subKey, subData]) => (
+                          <button
+                            key={subKey}
+                            onClick={() => setSelectedSubcategory(subKey)}
+                            className="text-left p-3 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all"
+                          >
+                            <div className="font-medium text-gray-800">{subData.name}</div>
+                            <div className="text-sm text-gray-500 mt-1">
+                              {subData.categories.length} kategorií dostupných
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Krok 3: Zobrazení produktů */}
+                  {selectedCategory && selectedSubcategory && (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 mb-4">
+                        <button
+                          onClick={() => setSelectedSubcategory(null)}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          ← Zpět
+                        </button>
+                        <h3 className="font-medium text-gray-700">
+                          3. Produkty v skupině "{getCategoryStructure()[selectedCategory]?.subcategories[selectedSubcategory]?.name}":
+                        </h3>
+                      </div>
+                      
+                      <div className="space-y-6">
+                        {getDisplayCategories().map((category) => (
+                          <div key={category} className="border-b pb-4">
+                            <h4 className="font-semibold text-gray-700 mb-3 bg-gray-50 p-2 rounded">
+                              {category}. {priceList[category]?.name}
+                            </h4>
+                            <div className="space-y-2">
+                              {priceList[category]?.items.map((item) => {
+                                const key = `${category}-${item.code}`;
+                                const isSelected = selectedItems[key]?.quantity > 0;
+                                return (
+                                  <div
+                                    key={item.code}
+                                    className="flex items-center gap-3 pl-4"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={() => toggleItem(category, item.code)}
+                                      className="w-4 h-4 text-blue-600"
+                                    />
+                                    <div className="flex-1">
+                                      <div className="text-sm">{item.name}</div>
+                                      <div className="text-xs text-gray-500">
+                                        {item.code} -{" "}
+                                        {item.price.toLocaleString("cs-CZ")} Kč
+                                      </div>
+                                    </div>
+                                    {isSelected && (
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        value={selectedItems[key]?.quantity || 0}
+                                        onChange={(e) =>
+                                          updateQuantity(
+                                            category,
+                                            item.code,
+                                            e.target.value
+                                          )
+                                        }
+                                        className="w-16 px-2 py-1 border rounded"
+                                      />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1218,13 +1448,20 @@ function App() {
                                   type="number"
                                   min="0"
                                   value={selectedWork[key]?.price || work.price}
-                                  onChange={(e) => updateWorkPrice(index, parseInt(e.target.value) || 0)}
+                                  onChange={(e) =>
+                                    updateWorkPrice(
+                                      index,
+                                      parseInt(e.target.value) || 0
+                                    )
+                                  }
                                   className="w-20 px-1 py-0.5 border rounded text-xs"
                                 />
                                 <span>Kč</span>
                               </>
                             ) : (
-                              <span>{work.price.toLocaleString("cs-CZ")} Kč</span>
+                              <span>
+                                {work.price.toLocaleString("cs-CZ")} Kč
+                              </span>
                             )}
                           </div>
                         </div>
@@ -1253,7 +1490,7 @@ function App() {
                 <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
                   Akce
                 </h2>
-                
+
                 <div className="space-y-3">
                   {/* Generování HTML nabídky */}
                   <button
@@ -1263,7 +1500,7 @@ function App() {
                     <FileText size={20} />
                     Vygenerovat nabídku a zkopírovat HTML
                   </button>
-                  
+
                   {/* Save/Load nabídky */}
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -1273,7 +1510,7 @@ function App() {
                       <Save size={16} />
                       Uložit nabídku
                     </button>
-                    
+
                     <label className="py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all flex items-center justify-center gap-2 cursor-pointer">
                       <Upload size={16} />
                       Načíst nabídku
