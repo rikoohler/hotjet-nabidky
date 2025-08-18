@@ -240,47 +240,65 @@ const EmailGenerator = ({
 
     const openEmailClient = async () => {
     const emailHtml = generateEmailContent();
-    
+ 
     try {
       // Moderní Clipboard API s HTML MIME typem
       if (navigator.clipboard && window.ClipboardItem) {
         const blob = new Blob([emailHtml], { type: "text/html" });
         const clipboardItem = new window.ClipboardItem({ "text/html": blob });
         await navigator.clipboard.write([clipboardItem]);
-        
-        // Otevření email klienta s předvyplněným předmětem
+ 
+        // Pokus o otevření email klienta s různými metodami
         const subject = encodeURIComponent(
           `Cenová nabídka - ${projectName || "HOTJET tepelné čerpadlo"}`
         );
-        const mailtoUrl = `mailto:?subject=${subject}`;
-        window.open(mailtoUrl, "_blank");
         
-        alert(`✅ Profesionální nabídka byla zkopírována do schránky!\n\n📧 Email klient byl otevřen.\n\n💡 Vložte obsah z schránky do těla emailu (Ctrl+V / Cmd+V).`);
+        // Metoda 1: Přímé otevření mailto
+        const mailtoUrl = `mailto:?subject=${subject}`;
+        const mailtoWindow = window.open(mailtoUrl, "_blank");
+        
+        // Metoda 2: Pokud mailto nefunguje, zkusíme jiné přístupy
+        setTimeout(() => {
+          if (!mailtoWindow || mailtoWindow.closed) {
+            // Zkusíme otevřít s location.href
+            try {
+              window.location.href = mailtoUrl;
+            } catch (e) {
+              console.log("Location.href selhal, zkusíme jiný přístup");
+            }
+          }
+        }, 100);
+ 
+        alert(
+          `✅ Profesionální nabídka byla zkopírována do schránky!\n\n📧 Pokus o otevření email klienta...\n\n💡 Pokud se email neotevřel automaticky:\n1. Otevřete váš email program ručně\n2. Vložte obsah z schránky (Ctrl+V / Cmd+V)`
+        );
       } else {
         // Fallback na starší metodu
         const textArea = document.createElement("textarea");
         textArea.value = emailHtml;
         document.body.appendChild(textArea);
         textArea.select();
-        
+ 
         if (document.execCommand("copy")) {
           document.body.removeChild(textArea);
-          
+ 
           const subject = encodeURIComponent(
             `Cenová nabídka - ${projectName || "HOTJET tepelné čerpadlo"}`
           );
           const mailtoUrl = `mailto:?subject=${subject}`;
           window.open(mailtoUrl, "_blank");
-          
-          alert(`✅ Nabídka byla zkopírována do schránky!\n\n📧 Email klient byl otevřen.\n\n💡 Vložte obsah z schránky do těla emailu (Ctrl+V / Cmd+V).`);
+ 
+          alert(
+            `✅ Nabídka byla zkopírována do schránky!\n\n📧 Pokus o otevření email klienta...\n\n💡 Pokud se email neotevřel automaticky:\n1. Otevřete váš email program ručně\n2. Vložte obsah z schránky (Ctrl+V / Cmd+V)`
+          );
         } else {
           throw new Error("Kopírování selhalo");
         }
       }
     } catch (error) {
       console.error("Chyba při otevírání email klienta:", error);
-      
-      // Fallback - otevři nové okno pro ruční kopírování
+ 
+      // Fallback - otevři nové okno s instrukcemi
       const newWindow = window.open("", "_blank");
       newWindow.document.write(`
         <!DOCTYPE html>
@@ -289,20 +307,32 @@ const EmailGenerator = ({
           <meta charset="UTF-8">
           <title>Nabídka - ${projectName}</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            .instructions { background: #f0f8ff; padding: 15px; border: 1px solid #0066cc; margin-bottom: 20px; border-radius: 5px; }
-            .copy-btn { background: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0; }
+            body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+            .instructions { background: #f0f8ff; padding: 20px; border: 2px solid #0066cc; margin-bottom: 20px; border-radius: 8px; }
+            .copy-btn { background: #0066cc; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; margin: 10px 0; font-size: 16px; }
             .copy-btn:hover { background: #0052a3; }
+            .email-btn { background: #28a745; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; margin: 10px 10px 10px 0; font-size: 16px; }
+            .email-btn:hover { background: #218838; }
+            .steps { background: #fff3cd; padding: 15px; border: 1px solid #ffeaa7; border-radius: 6px; margin: 15px 0; }
+            .steps ol { margin: 10px 0; padding-left: 20px; }
+            .steps li { margin: 5px 0; }
           </style>
         </head>
         <body>
           <div class="instructions">
-            <h3>📋 Instrukce pro kopírování:</h3>
-            <p>1. Klikněte na tlačítko "Kopírovat nabídku" níže</p>
-            <p>2. Otevřete váš email klient</p>
-            <p>3. Vložte obsah do těla emailu (Ctrl+V / Cmd+V)</p>
+            <h2>📧 Generování emailu s nabídkou</h2>
+            <div class="steps">
+              <h3>📋 Postup:</h3>
+              <ol>
+                <li>Klikněte na tlačítko <strong>"Kopírovat nabídku"</strong> níže</li>
+                <li>Otevřete váš email program (Outlook, Mail, Gmail, atd.)</li>
+                <li>Vložte obsah do těla emailu pomocí <strong>Ctrl+V</strong> (Windows) nebo <strong>Cmd+V</strong> (Mac)</li>
+                <li>Doplňte příjemce a odešlete</li>
+              </ol>
+            </div>
+            <button class="copy-btn" onclick="copyContent()">📋 Kopírovat nabídku</button>
+            <button class="email-btn" onclick="openEmailClient()">📧 Otevřít email klient</button>
           </div>
-          <button class="copy-btn" onclick="copyContent()">📋 Kopírovat nabídku</button>
           <hr>
           <div id="content">
             ${emailHtml}
@@ -311,7 +341,7 @@ const EmailGenerator = ({
             function copyContent() {
               const content = document.getElementById('content').innerHTML;
               navigator.clipboard.writeText(content).then(() => {
-                alert('✅ Nabídka byla zkopírována do schránky!');
+                alert('✅ Nabídka byla zkopírována do schránky!\\n\\nNyní můžete vložit do emailu pomocí Ctrl+V / Cmd+V');
               }).catch(() => {
                 // Fallback pro starší prohlížeče
                 const textArea = document.createElement('textarea');
@@ -320,22 +350,42 @@ const EmailGenerator = ({
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                alert('✅ Nabídka byla zkopírována do schránky!');
+                alert('✅ Nabídka byla zkopírována do schránky!\\n\\nNyní můžete vložit do emailu pomocí Ctrl+V / Cmd+V');
               });
+            }
+            
+            function openEmailClient() {
+              const subject = encodeURIComponent('Cenová nabídka - ${projectName || "HOTJET tepelné čerpadlo"}');
+              const mailtoUrl = 'mailto:?subject=' + subject;
+              
+              // Zkusíme různé metody otevření
+              const mailtoWindow = window.open(mailtoUrl, '_blank');
+              
+              setTimeout(() => {
+                if (!mailtoWindow || mailtoWindow.closed) {
+                  try {
+                    window.location.href = mailtoUrl;
+                  } catch (e) {
+                    alert('❌ Nepodařilo se otevřít email klient automaticky.\\n\\n💡 Otevřete váš email program ručně a vložte obsah z schránky.');
+                  }
+                }
+              }, 100);
             }
           </script>
         </body>
         </html>
       `);
       newWindow.document.close();
-      
-      alert("📋 Nabídka byla otevřena v novém okně.\n\n💡 Použijte tlačítko 'Kopírovat nabídku' a pak vložte do emailu.");
+ 
+      alert(
+        "📋 Nabídka byla otevřena v novém okně.\n\n💡 Použijte tlačítko 'Kopírovat nabídku' a pak vložte do emailu."
+      );
     }
   };
 
-    const copyToClipboard = async () => {
+  const copyToClipboard = async () => {
     const emailHtml = generateEmailContent();
- 
+
     try {
       // Moderní Clipboard API s HTML MIME typem
       if (navigator.clipboard && window.ClipboardItem) {
@@ -355,7 +405,7 @@ const EmailGenerator = ({
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        
+
         if (document.execCommand("copy")) {
           document.body.removeChild(textArea);
           alert(
@@ -367,7 +417,7 @@ const EmailGenerator = ({
       }
     } catch (error) {
       console.error("Kopírování selhalo:", error);
-      
+
       // Fallback - otevři nové okno pro ruční kopírování
       const newWindow = window.open("", "_blank");
       newWindow.document.write(`
@@ -416,8 +466,10 @@ const EmailGenerator = ({
         </html>
       `);
       newWindow.document.close();
-      
-      alert("📋 Nabídka byla otevřena v novém okně.\n\n💡 Použijte tlačítko 'Kopírovat nabídku' a pak vložte do emailu.");
+
+      alert(
+        "📋 Nabídka byla otevřena v novém okně.\n\n💡 Použijte tlačítko 'Kopírovat nabídku' a pak vložte do emailu."
+      );
     }
   };
 
@@ -462,14 +514,14 @@ const EmailGenerator = ({
         </div>
       ) : (
         <div className="space-y-3">
-          {/* Otevření email klienta */}
-          <button
-            onClick={openEmailClient}
-            className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-all flex items-center justify-center gap-2"
-          >
-            <Mail size={20} />
-            📧 Otevřít email klienta
-          </button>
+                     {/* Otevření email klienta */}
+           <button
+             onClick={openEmailClient}
+             className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-all flex items-center justify-center gap-2"
+           >
+             <Mail size={20} />
+             📧 Zkopírovat a otevřít email
+           </button>
 
           {/* Kopírování do schránky */}
           <button
@@ -511,25 +563,27 @@ const EmailGenerator = ({
             </label>
           </div>
 
-                     <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-             <h4 className="text-sm font-medium text-blue-800 mb-2">
-               💡 Tipy pro email:
-             </h4>
-             <ul className="text-xs text-blue-700 space-y-1">
-               <li>
-                 • <strong>Otevřít email klienta</strong> - zkopíruje nabídku a otevře email program
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="text-sm font-medium text-blue-800 mb-2">
+              💡 Tipy pro email:
+            </h4>
+            <ul className="text-xs text-blue-700 space-y-1">
+                             <li>
+                 • <strong>Zkopírovat a otevřít email</strong> - zkopíruje nabídku a pokusí se otevřít email program
                </li>
-               <li>
-                 • <strong>Zkopírovat do schránky</strong> - zkopíruje s formátováním pro email
-               </li>
-               <li>
-                 • <strong>Stáhnout HTML</strong> - uloží jako soubor pro pozdější použití
-               </li>
-               <li className="text-blue-600 font-medium">
-                 💡 Všechny metody zachovávají profesionální formátování!
-               </li>
-             </ul>
-           </div>
+              <li>
+                • <strong>Zkopírovat do schránky</strong> - zkopíruje s
+                formátováním pro email
+              </li>
+              <li>
+                • <strong>Stáhnout HTML</strong> - uloží jako soubor pro
+                pozdější použití
+              </li>
+              <li className="text-blue-600 font-medium">
+                💡 Všechny metody zachovávají profesionální formátování!
+              </li>
+            </ul>
+          </div>
         </div>
       )}
     </div>
