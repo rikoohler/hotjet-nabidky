@@ -14,7 +14,7 @@ export const getDiscount = (customerType) => {
 };
 
 export const getVatRate = (customerType) => {
-  return customerType === "koncovy" ? 0.12 : 0.21;
+  return customerType === "customer" ? 0.12 : 0.21;
 };
 
 export const calculateTotals = (

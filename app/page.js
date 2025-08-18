@@ -37,6 +37,7 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
   const [discount, setDiscount] = useState(0);
+  const [offerDescription, setOfferDescription] = useState("");
 
   // State pro data
   const [priceList] = useState(defaultPriceList);
@@ -280,10 +281,28 @@ function App() {
                 updateWorkPrice={updateWorkPrice}
               />
 
+              {/* Pole pro popis nabídky */}
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  📝 Popis nabídky
+                </h3>
+                <textarea
+                  value={offerDescription}
+                  onChange={(e) => setOfferDescription(e.target.value)}
+                  placeholder="Zde můžete přidat popis a vysvětlení k nabídce..."
+                  className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 resize-y"
+                  style={{ minHeight: '100px' }}
+                />
+                <p className="text-sm text-gray-600 mt-2">
+                  💡 Tento text se zobrazí v nabídce pouze pokud není prázdný
+                </p>
+              </div>
+
               <EmailGenerator
                 projectName={projectName}
                 customerName={customerName}
                 offerDate={offerDate}
+                offerDescription={offerDescription}
                 selectedItems={selectedItems}
                 selectedWork={selectedWork}
                 customerType={customerType}

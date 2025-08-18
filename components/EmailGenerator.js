@@ -7,6 +7,7 @@ const EmailGenerator = ({
   projectName,
   customerName,
   offerDate,
+  offerDescription,
   selectedItems,
   selectedWork,
   customerType,
@@ -57,14 +58,25 @@ const EmailGenerator = ({
   
   <h1 style="color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px;">CENOVÁ NABÍDKA</h1>
   
-  <div style="margin: 20px 0;">
-    <p><strong>Akce:</strong> ${projectName}</p>
-    <p><strong>Zákazník:</strong> ${customerName}</p>
-    <p><strong>Datum vystavení:</strong> ${new Date(
-      offerDate
-    ).toLocaleDateString("cs-CZ")}</p>
-    <p><strong>Platnost nabídky:</strong> 30 dní</p>
+  <div style="margin: 20px 0; display: flex; justify-content: space-between;">
+    <div style="flex: 1;">
+      <p><strong>Akce:</strong> ${projectName}</p>
+      <p><strong>Zákazník:</strong> ${customerName}</p>
+    </div>
+    <div style="flex: 1; text-align: right;">
+      <p><strong>Datum vystavení:</strong> ${new Date(
+        offerDate
+      ).toLocaleDateString("cs-CZ")}</p>
+      <p><strong>Platnost nabídky:</strong> 30 dní</p>
+    </div>
   </div>
+  
+  ${offerDescription ? `
+  <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-left: 4px solid #667eea; border-radius: 4px;">
+    <h3 style="margin: 0 0 10px 0; color: #333;">📝 Popis nabídky</h3>
+    <div style="white-space: pre-line; line-height: 1.5;">${offerDescription}</div>
+  </div>
+  ` : ''}
   
   <hr style="border: 1px solid #ddd;">
 `;
@@ -540,86 +552,86 @@ const EmailGenerator = ({
         📧 Generování emailu
       </h2>
 
-      {!hasItems ? (
-        <div className="text-center py-8 text-gray-500">
-          <Mail size={48} className="mx-auto mb-4 text-gray-300" />
-          <p>Nejdříve vyberte produkty a práce pro generování nabídky</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {/* Otevření email klienta */}
-          <button
-            onClick={openEmailClient}
-            className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-all flex items-center justify-center gap-2"
-          >
-            <Mail size={20} />
-            📧 Zkopírovat a otevřít email
-          </button>
-
-          {/* Kopírování do schránky */}
-          <button
-            onClick={copyToClipboard}
-            className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center justify-center gap-2"
-          >
-            <Copy size={20} />
-            📋 Zkopírovat do schránky
-          </button>
-
-          {/* Stažení HTML souboru */}
-          <button
-            onClick={downloadHtml}
-            className="w-full py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-all flex items-center justify-center gap-2"
-          >
-            <Download size={16} />
-            💾 Stáhnout jako HTML
-          </button>
-
-          {/* Save/Load nabídky */}
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={saveQuote}
-              className="py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all flex items-center justify-center gap-2"
-            >
-              <Download size={16} />
-              Uložit nabídku
-            </button>
-
-            <label className="py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all flex items-center justify-center gap-2 cursor-pointer">
-              <Download size={16} />
-              Načíst nabídku
-              <input
-                type="file"
-                accept=".json"
-                onChange={loadQuote}
-                className="hidden"
-              />
-            </label>
-          </div>
-
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="text-sm font-medium text-blue-800 mb-2">
-              💡 Tipy pro email:
-            </h4>
-            <ul className="text-xs text-blue-700 space-y-1">
-              <li>
-                • <strong>Zkopírovat a otevřít email</strong> - zkopíruje
-                nabídku a pokusí se otevřít email program
-              </li>
-              <li>
-                • <strong>Zkopírovat do schránky</strong> - zkopíruje s
-                formátováním pro email
-              </li>
-              <li>
-                • <strong>Stáhnout HTML</strong> - uloží jako soubor pro
-                pozdější použití
-              </li>
-              <li className="text-blue-600 font-medium">
-                💡 Všechny metody zachovávají profesionální formátování!
-              </li>
-            </ul>
-          </div>
+      {!hasItems && (
+        <div className="text-center py-4 text-gray-500 mb-4">
+          <Mail size={32} className="mx-auto mb-2 text-gray-300" />
+          <p className="text-sm">💡 Můžete generovat nabídku i bez položek - bude obsahovat pouze základní údaje</p>
         </div>
       )}
+      
+      <div className="space-y-3">
+        {/* Otevření email klienta */}
+        <button
+          onClick={openEmailClient}
+          className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-all flex items-center justify-center gap-2"
+        >
+          <Mail size={20} />
+          📧 Zkopírovat a otevřít email
+        </button>
+
+        {/* Kopírování do schránky */}
+        <button
+          onClick={copyToClipboard}
+          className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center justify-center gap-2"
+        >
+          <Copy size={20} />
+          📋 Zkopírovat do schránky
+        </button>
+
+        {/* Stažení HTML souboru */}
+        <button
+          onClick={downloadHtml}
+          className="w-full py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-all flex items-center justify-center gap-2"
+        >
+          <Download size={16} />
+          💾 Stáhnout jako HTML
+        </button>
+
+        {/* Save/Load nabídky */}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={saveQuote}
+            className="py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all flex items-center justify-center gap-2"
+          >
+            <Download size={16} />
+            Uložit nabídku
+          </button>
+
+          <label className="py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <Download size={16} />
+            Načíst nabídku
+            <input
+              type="file"
+              accept=".json"
+              onChange={loadQuote}
+              className="hidden"
+            />
+          </label>
+        </div>
+
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <h4 className="text-sm font-medium text-blue-800 mb-2">
+            💡 Tipy pro email:
+          </h4>
+          <ul className="text-xs text-blue-700 space-y-1">
+            <li>
+              • <strong>Zkopírovat a otevřít email</strong> - zkopíruje
+              nabídku a pokusí se otevřít email program
+            </li>
+            <li>
+              • <strong>Zkopírovat do schránky</strong> - zkopíruje s
+              formátováním pro email
+            </li>
+            <li>
+              • <strong>Stáhnout HTML</strong> - uloží jako soubor pro
+              pozdější použití
+            </li>
+            <li className="text-blue-600 font-medium">
+              💡 Všechny metody zachovávají profesionální formátování!
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
