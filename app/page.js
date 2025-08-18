@@ -36,6 +36,7 @@ function App() {
   const [heatPumpType, setHeatPumpType] = useState("vzduch");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [discount, setDiscount] = useState(0);
 
   // State pro data
   const [priceList] = useState(defaultPriceList);
@@ -191,9 +192,19 @@ function App() {
       <div className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-gray-900">
-              HOTJET - Generátor nabídek
-            </h1>
+            <div className="flex items-center gap-4">
+              <img 
+                src="/hotjet-logo.svg" 
+                alt="HOTJET Logo" 
+                className="h-12 w-auto"
+              />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  HOTJET - Generátor nabídek
+                </h1>
+                <p className="text-sm text-gray-600">Tepelná čerpadla vzduch-voda a země/voda-voda</p>
+              </div>
+            </div>
             <div className="flex space-x-4">
               <button
                 onClick={() => setActiveTab("generator")}
@@ -240,6 +251,8 @@ function App() {
                 setHeatPumpType={setHeatPumpType}
                 setSelectedCategory={setSelectedCategory}
                 setSelectedSubcategory={setSelectedSubcategory}
+                discount={discount}
+                setDiscount={setDiscount}
               />
 
               <CategoryNavigation
@@ -273,6 +286,7 @@ function App() {
                 selectedWork={selectedWork}
                 customerType={customerType}
                 priceList={priceList}
+                discount={discount}
                 saveQuote={saveQuote}
                 loadQuote={loadQuote}
               />
@@ -281,6 +295,7 @@ function App() {
                 selectedItems={selectedItems}
                 selectedWork={selectedWork}
                 customerType={customerType}
+                discount={discount}
                 removeItem={removeItem}
                 removeWork={removeWork}
               />

@@ -1,6 +1,7 @@
 // Komponenta pro stromovou navigaci kategorií
 import React from "react";
 import { formatPrice } from "../utils/calculations";
+import { ChevronRight, ArrowLeft } from "lucide-react";
 
 const CategoryNavigation = ({
   heatPumpType,
@@ -86,10 +87,24 @@ const CategoryNavigation = ({
 
   return (
     <div className="bg-white rounded-xl shadow-md p-6 max-h-screen overflow-y-auto">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
-        Výběr položek -{" "}
-        {heatPumpType === "vzduch" ? "Vzduch-voda" : "Země/Voda-voda"}
-      </h2>
+      <div className="flex items-center justify-between mb-4 border-b pb-2">
+        <h2 className="text-xl font-semibold text-gray-800">
+          Výběr položek -{" "}
+          {heatPumpType === "vzduch" ? "Vzduch-voda" : "Země/Voda-voda"}
+        </h2>
+        {(selectedCategory || selectedSubcategory) && (
+          <button
+            onClick={() => {
+              setSelectedSubcategory("");
+              setSelectedCategory("");
+            }}
+            className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all text-sm"
+          >
+            <ArrowLeft size={16} />
+            Zpět
+          </button>
+        )}
+      </div>
 
       {/* Rychlý přehled vybraných položek */}
       {Object.keys(selectedItems).length > 0 && (

@@ -17,8 +17,8 @@ export const getVatRate = (customerType) => {
   return customerType === "koncovy" ? 0.12 : 0.21;
 };
 
-export const calculateTotals = (selectedItems, selectedWork, customerType) => {
-  const discount = getDiscount(customerType);
+export const calculateTotals = (selectedItems, selectedWork, customerType, customDiscount = 0) => {
+  const discount = customDiscount || getDiscount(customerType);
   const vat = getVatRate(customerType);
 
   let heatPumpTotal = 0;
