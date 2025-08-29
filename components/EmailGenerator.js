@@ -71,12 +71,16 @@ const EmailGenerator = ({
     </div>
   </div>
   
-  ${offerDescription ? `
+  ${
+    offerDescription
+      ? `
   <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-left: 4px solid #667eea; border-radius: 4px;">
     <h3 style="margin: 0 0 10px 0; color: #333;">📝 Popis nabídky</h3>
     <div style="white-space: pre-line; line-height: 1.5;">${offerDescription}</div>
   </div>
-  ` : ''}
+  `
+      : ""
+  }
   
   <hr style="border: 1px solid #ddd;">
 `;
@@ -546,20 +550,13 @@ const EmailGenerator = ({
     Object.keys(selectedItems).length > 0 ||
     Object.keys(selectedWork).length > 0;
 
-  return (
+    return (
     <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
+      <h2 className="text-xl font-semibold mb-3 text-gray-800 border-b pb-2">
         📧 Generování emailu
       </h2>
 
-      {!hasItems && (
-        <div className="text-center py-2 text-gray-500 mb-4">
-          <Mail size={24} className="mx-auto mb-1 text-gray-300" />
-          <p className="text-xs">💡 Můžete generovat nabídku i bez položek</p>
-        </div>
-      )}
-      
-      {/* Hlavní tlačítka ve vodorovné liště */}
+      {/* Hlavní tlačítka ve vodorovné liště - přímo pod záhlavím */}
       <div className="grid grid-cols-2 gap-2 mb-3">
         <button
           onClick={openEmailClient}
@@ -579,7 +576,7 @@ const EmailGenerator = ({
       </div>
 
       {/* Druhořadá tlačítka ve vodorovné liště */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2 mb-4">
         <button
           onClick={downloadHtml}
           className="py-2 px-2 bg-gray-600 text-white rounded-lg text-xs font-medium hover:bg-gray-700 transition-all flex items-center justify-center gap-1"
@@ -607,6 +604,13 @@ const EmailGenerator = ({
           />
         </label>
       </div>
+
+      {!hasItems && (
+        <div className="text-center py-2 text-gray-500">
+          <Mail size={24} className="mx-auto mb-1 text-gray-300" />
+          <p className="text-xs">💡 Můžete generovat nabídku i bez položek</p>
+        </div>
+      )}
     </div>
   );
 };
