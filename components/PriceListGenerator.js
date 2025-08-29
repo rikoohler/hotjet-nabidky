@@ -354,55 +354,29 @@ const PriceListGenerator = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">
+    <div>
+      <h2 className="text-lg font-semibold mb-3 text-gray-800 border-b pb-2">
         📋 Generování celého ceníku
       </h2>
 
-      <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h4 className="text-sm font-medium text-blue-800 mb-2">
-          💡 Co obsahuje celý ceník:
-        </h4>
-        <ul className="text-xs text-blue-700 space-y-1">
-          <li>• Všechny tepelná čerpadla vzduch-voda (A, B, D, E, H)</li>
-          <li>• Rozvaděče a hydromoduly (C1, C2, J)</li>
-          <li>• Tepelná čerpadla země/voda-voda (F, G)</li>
-          <li>• Všechno příslušenství (M, N, O, P, Q, R, S, T, Z)</li>
-          <li>• Práce a materiál pro oba typy čerpadel</li>
-          <li>• Profesionální formátování s HOTJET logem</li>
-        </ul>
-      </div>
-
-      <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
         {/* Kopírování do schránky */}
         <button
           onClick={copyToClipboard}
-          className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center justify-center gap-2"
+          className="py-2 px-3 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all flex items-center justify-center gap-1"
         >
-          <Copy size={20} />
-          📋 Zkopírovat celý ceník
+          <Copy size={16} />
+          📋 Zkopírovat ceník
         </button>
 
         {/* Stažení HTML souboru */}
         <button
           onClick={downloadHtml}
-          className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-all flex items-center justify-center gap-2"
+          className="py-2 px-3 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-all flex items-center justify-center gap-1"
         >
-          <Download size={20} />
-          💾 Stáhnout celý ceník
+          <Download size={16} />
+          💾 Stáhnout ceník
         </button>
-      </div>
-
-      <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-        <h4 className="text-sm font-medium text-green-800 mb-2">
-          ✅ Výhody celého ceníku:
-        </h4>
-        <ul className="text-xs text-green-700 space-y-1">
-          <li>• Kompletní přehled všech produktů a cen</li>
-          <li>• Profesionální formátování vhodné pro tisk</li>
-          <li>• Obsahuje všechny kategorie a podkategorie</li>
-          <li>• Ideální pro distribuci zákazníkům</li>
-        </ul>
       </div>
     </div>
   );

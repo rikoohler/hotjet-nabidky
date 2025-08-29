@@ -550,9 +550,9 @@ const EmailGenerator = ({
     Object.keys(selectedItems).length > 0 ||
     Object.keys(selectedWork).length > 0;
 
-    return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-3 text-gray-800 border-b pb-2">
+  return (
+    <div>
+      <h2 className="text-lg font-semibold mb-3 text-gray-800 border-b pb-2">
         📧 Generování emailu
       </h2>
 
@@ -604,13 +604,6 @@ const EmailGenerator = ({
           />
         </label>
       </div>
-
-      {!hasItems && (
-        <div className="text-center py-2 text-gray-500">
-          <Mail size={24} className="mx-auto mb-1 text-gray-300" />
-          <p className="text-xs">💡 Můžete generovat nabídku i bez položek</p>
-        </div>
-      )}
     </div>
   );
 };

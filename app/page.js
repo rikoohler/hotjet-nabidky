@@ -240,89 +240,95 @@ function App() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {activeTab === "generator" ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-6">
-              <BasicInfoForm
-                projectName={projectName}
-                setProjectName={setProjectName}
-                customerName={customerName}
-                setCustomerName={setCustomerName}
-                offerDate={offerDate}
-                setOfferDate={setOfferDate}
-                customerType={customerType}
-                setCustomerType={setCustomerType}
-                heatPumpType={heatPumpType}
-                setHeatPumpType={setHeatPumpType}
-                setSelectedCategory={setSelectedCategory}
-                setSelectedSubcategory={setSelectedSubcategory}
-                discount={discount}
-                setDiscount={setDiscount}
-              />
-
-              <CategoryNavigation
-                heatPumpType={heatPumpType}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-                selectedSubcategory={selectedSubcategory}
-                setSelectedSubcategory={setSelectedSubcategory}
-                selectedItems={selectedItems}
-                priceList={priceList}
-                toggleItem={toggleItem}
-                updateQuantity={updateQuantity}
-              />
-            </div>
-
-            <div className="space-y-6">
-              <WorkSelection
-                heatPumpType={heatPumpType}
-                workPrices={workPrices}
-                selectedWork={selectedWork}
-                toggleWork={toggleWork}
-                updateWorkQuantity={updateWorkQuantity}
-                updateWorkPrice={updateWorkPrice}
-              />
-
-              {/* Pole pro popis nabídky */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  📝 Popis nabídky
-                </h3>
-                <textarea
-                  value={offerDescription}
-                  onChange={(e) => setOfferDescription(e.target.value)}
-                  placeholder="Zde můžete přidat popis a vysvětlení k nabídce..."
-                  className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 resize-y"
-                  style={{ minHeight: "100px" }}
+          <div className="space-y-6">
+            {/* Generátory nahoru na celou šířku */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="bg-white rounded-xl shadow-md p-4">
+                <EmailGenerator
+                  projectName={projectName}
+                  customerName={customerName}
+                  offerDate={offerDate}
+                  offerDescription={offerDescription}
+                  selectedItems={selectedItems}
+                  selectedWork={selectedWork}
+                  customerType={customerType}
+                  priceList={priceList}
+                  discount={discount}
+                  saveQuote={saveQuote}
+                  loadQuote={loadQuote}
                 />
-                <p className="text-sm text-gray-600 mt-2">
-                  💡 Tento text se zobrazí v nabídce pouze pokud není prázdný
-                </p>
               </div>
 
-              <PriceListGenerator />
+              <div className="bg-white rounded-xl shadow-md p-4">
+                <PriceListGenerator />
+              </div>
+            </div>
 
-              <EmailGenerator
-                projectName={projectName}
-                customerName={customerName}
-                offerDate={offerDate}
-                offerDescription={offerDescription}
-                selectedItems={selectedItems}
-                selectedWork={selectedWork}
-                customerType={customerType}
-                priceList={priceList}
-                discount={discount}
-                saveQuote={saveQuote}
-                loadQuote={loadQuote}
-              />
+            {/* Hlavní obsah ve dvou sloupcích */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-6">
+                <BasicInfoForm
+                  projectName={projectName}
+                  setProjectName={setProjectName}
+                  customerName={customerName}
+                  setCustomerName={setCustomerName}
+                  offerDate={offerDate}
+                  setOfferDate={setOfferDate}
+                  customerType={customerType}
+                  setCustomerType={setCustomerType}
+                  heatPumpType={heatPumpType}
+                  setHeatPumpType={setHeatPumpType}
+                  setSelectedCategory={setSelectedCategory}
+                  setSelectedSubcategory={setSelectedSubcategory}
+                  discount={discount}
+                  setDiscount={setDiscount}
+                />
 
-              <SelectedItemsList
-                selectedItems={selectedItems}
-                selectedWork={selectedWork}
-                customerType={customerType}
-                discount={discount}
-                removeItem={removeItem}
-                removeWork={removeWork}
-              />
+                <CategoryNavigation
+                  heatPumpType={heatPumpType}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  selectedSubcategory={selectedSubcategory}
+                  setSelectedSubcategory={setSelectedSubcategory}
+                  selectedItems={selectedItems}
+                  priceList={priceList}
+                  toggleItem={toggleItem}
+                  updateQuantity={updateQuantity}
+                  selectedWork={selectedWork}
+                  toggleWork={toggleWork}
+                  updateWorkQuantity={updateWorkQuantity}
+                  updateWorkPrice={updateWorkPrice}
+                  workPrices={workPrices}
+                />
+              </div>
+
+              <div className="space-y-6">
+                <SelectedItemsList
+                  selectedItems={selectedItems}
+                  selectedWork={selectedWork}
+                  customerType={customerType}
+                  discount={discount}
+                  removeItem={removeItem}
+                  removeWork={removeWork}
+                />
+
+                {/* Pole pro popis nabídky - přesunuto dolů */}
+                <div className="bg-white rounded-xl shadow-md p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                    📝 Popis nabídky
+                  </h3>
+                  <textarea
+                    value={offerDescription}
+                    onChange={(e) => setOfferDescription(e.target.value)}
+                    placeholder="Zde můžete přidat popis a vysvětlení k nabídce..."
+                    className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 resize-y"
+                    style={{ minHeight: "100px" }}
+                  />
+                  <p className="text-sm text-gray-600 mt-2">
+                    💡 Tento text se zobrazí v nabídce pouze pokud není prázdný
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         ) : (

@@ -3,6 +3,83 @@ import React from "react";
 import { formatPrice } from "../utils/calculations";
 import { ChevronRight, ArrowLeft } from "lucide-react";
 
+// Komponenta pro zobrazení prací v rámci CategoryNavigation
+const WorkComponent = ({
+  heatPumpType,
+  selectedWork,
+  toggleWork,
+  updateWorkQuantity,
+  updateWorkPrice,
+  workPrices,
+}) => {
+  const workItems =
+    heatPumpType === "zeme" ? workPrices.zemeVoda : workPrices.vzduchVoda;
+
+  return (
+    <div className="border-b pb-4">
+      <h4 className="font-semibold text-gray-700 mb-3 bg-gray-50 p-2 rounded">
+        Práce a instalační materiál
+      </h4>
+      <div className="space-y-2">
+        {workItems.map((work, index) => {
+          const key = `work-${index}`;
+          const isSelected = selectedWork[key]?.quantity > 0;
+          return (
+            <div key={index} className="flex items-center gap-3 pl-4">
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => toggleWork(index)}
+                className="w-4 h-4 text-blue-600"
+              />
+              <div className="flex-1">
+                <div className="text-sm">{work.name}</div>
+                <div className="text-xs text-gray-500 flex items-center gap-2">
+                  {isSelected ? (
+                    <>
+                      <input
+                        type="number"
+                        min="0"
+                        value={selectedWork[key]?.price || work.price}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === "") {
+                            updateWorkPrice(index, "");
+                          } else {
+                            updateWorkPrice(index, parseInt(value) || 0);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === "") {
+                            updateWorkPrice(index, work.price);
+                          }
+                        }}
+                        className="w-20 px-1 py-0.5 border rounded text-xs text-gray-900"
+                      />
+                      <span>Kč</span>
+                    </>
+                  ) : (
+                    <span>{formatPrice(work.price)} Kč</span>
+                  )}
+                </div>
+              </div>
+              {isSelected && (
+                <input
+                  type="number"
+                  min="0"
+                  value={selectedWork[key]?.quantity || 0}
+                  onChange={(e) => updateWorkQuantity(index, e.target.value)}
+                  className="w-16 px-2 py-1 border rounded text-gray-900"
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const CategoryNavigation = ({
   heatPumpType,
   selectedCategory,
@@ -13,6 +90,12 @@ const CategoryNavigation = ({
   priceList,
   toggleItem,
   updateQuantity,
+  // Nové props pro práce
+  selectedWork,
+  toggleWork,
+  updateWorkQuantity,
+  updateWorkPrice,
+  workPrices,
 }) => {
   // Nová struktura kategorií podle typu TČ
   const getCategoryStructure = () => {
@@ -41,6 +124,15 @@ const CategoryNavigation = ({
             },
           },
         },
+        work: {
+          name: "Práce a instalační materiál",
+          subcategories: {
+            installation: {
+              name: "Instalační práce",
+              categories: ["WORK"],
+            },
+          },
+        },
       };
     } else {
       return {
@@ -57,6 +149,15 @@ const CategoryNavigation = ({
             all: {
               name: "Vše",
               categories: ["M", "N", "O", "P", "Q", "R", "S", "T", "Z"],
+            },
+          },
+        },
+        work: {
+          name: "Práce a instalační materiál",
+          subcategories: {
+            installation: {
+              name: "Instalační práce",
+              categories: ["WORK"],
             },
           },
         },
@@ -239,69 +340,86 @@ const CategoryNavigation = ({
             </div>
 
             <div className="space-y-6">
-              {getDisplayCategories().map((category) => (
-                <div key={category} className="border-b pb-4">
-                  <h4 className="font-semibold text-gray-700 mb-3 bg-gray-50 p-2 rounded">
-                    {category}. {priceList[category]?.name}
-                  </h4>
+              {getDisplayCategories().map((category) => {
+                // Speciální handling pro kategorii WORK (práce a materiál)
+                if (category === "WORK") {
+                  return (
+                    <WorkComponent
+                      key={category}
+                      heatPumpType={heatPumpType}
+                      selectedWork={selectedWork}
+                      toggleWork={toggleWork}
+                      updateWorkQuantity={updateWorkQuantity}
+                      updateWorkPrice={updateWorkPrice}
+                      workPrices={workPrices}
+                    />
+                  );
+                }
 
-                  {/* Popis kategorie */}
-                  {priceList[category]?.description && (
-                    <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-200 rounded-r">
-                      <div className="text-sm text-gray-700 whitespace-pre-line">
-                        {priceList[category].description
-                          .split("\n")
-                          .map((line, index) => (
-                            <div key={index} className="mb-1">
-                              {line}
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )}
+                return (
+                  <div key={category} className="border-b pb-4">
+                    <h4 className="font-semibold text-gray-700 mb-3 bg-gray-50 p-2 rounded">
+                      {category}. {priceList[category]?.name}
+                    </h4>
 
-                  <div className="space-y-2">
-                    {priceList[category]?.items.map((item) => {
-                      const key = `${category}-${item.code}`;
-                      const isSelected = selectedItems[key]?.quantity > 0;
-                      return (
-                        <div
-                          key={item.code}
-                          className="flex items-center gap-3 pl-4"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => toggleItem(category, item.code)}
-                            className="w-4 h-4 text-blue-600"
-                          />
-                          <div className="flex-1">
-                            <div className="text-sm">{item.name}</div>
-                            <div className="text-xs text-gray-500">
-                              {item.code} - {formatPrice(item.price)} Kč
-                            </div>
-                          </div>
-                          {isSelected && (
-                            <input
-                              type="number"
-                              min="0"
-                              value={selectedItems[key]?.quantity || 0}
-                              onChange={(e) =>
-                                updateQuantity(
-                                  category,
-                                  item.code,
-                                  e.target.value
-                                )
-                              }
-                              className="w-16 px-2 py-1 border rounded text-gray-900"
-                            />
-                          )}
+                    {/* Popis kategorie - skrytý v UI, zachován pro tisk/export */}
+                    {false && priceList[category]?.description && (
+                      <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-200 rounded-r">
+                        <div className="text-sm text-gray-700 whitespace-pre-line">
+                          {priceList[category].description
+                            .split("\n")
+                            .map((line, index) => (
+                              <div key={index} className="mb-1">
+                                {line}
+                              </div>
+                            ))}
                         </div>
-                      );
-                    })}
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      {priceList[category]?.items.map((item) => {
+                        const key = `${category}-${item.code}`;
+                        const isSelected = selectedItems[key]?.quantity > 0;
+                        return (
+                          <div
+                            key={item.code}
+                            className="flex items-center gap-3 pl-4"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleItem(category, item.code)}
+                              className="w-4 h-4 text-blue-600"
+                            />
+                            <div className="flex-1">
+                              <div className="text-sm">{item.name}</div>
+                              <div className="text-xs text-gray-500">
+                                {item.code} - {formatPrice(item.price)} Kč
+                              </div>
+                            </div>
+                            {isSelected && (
+                              <input
+                                type="number"
+                                min="0"
+                                value={selectedItems[key]?.quantity || 0}
+                                onChange={(e) =>
+                                  updateQuantity(
+                                    category,
+                                    item.code,
+                                    e.target.value
+                                  )
+                                }
+                                className="w-16 px-2 py-1 border rounded text-gray-900"
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
